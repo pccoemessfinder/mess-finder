@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contact Us - PCCOE/DYP Mess Finder</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Segoe UI',sans-serif;
+}
+
+body{
+    background:linear-gradient(135deg,#0f172a,#1e293b,#334155);
+    color:white;
+    min-height:100vh;
+}
+
+/* Navbar */
+
+nav{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:20px 8%;
+    background:rgba(255,255,255,0.1);
+}
+
+.logo{
+    font-size:24px;
+    font-weight:bold;
+}
+
+nav ul{
+    display:flex;
+    list-style:none;
+}
+
+nav ul li{
+    margin-left:25px;
+}
+
+nav ul li a{
+    text-decoration:none;
+    color:white;
+    font-weight:500;
+}
+
+nav ul li a:hover{
+    color:#38bdf8;
+}
+
+/* Contact Box */
+
+.contact-container{
+    max-width:800px;
+    margin:50px auto;
+    padding:20px;
+}
+
+.contact-box{
+    background:rgba(255,255,255,0.1);
+    padding:30px;
+    border-radius:20px;
+    text-align:center;
+}
+
+.contact-box h1{
+    margin-bottom:20px;
+}
+
+.contact-info{
+    margin-bottom:25px;
+    line-height:2;
+}
+
+input,
+textarea{
+    width:100%;
+    padding:15px;
+    margin:10px 0;
+    border:none;
+    border-radius:10px;
+    font-size:16px;
+}
+
+button{
+    background:#38bdf8;
+    color:white;
+    border:none;
+    padding:14px 30px;
+    border-radius:30px;
+    cursor:pointer;
+    font-size:16px;
+}
+
+button:hover{
+    background:#0ea5e9;
+}
+
+footer{
+    text-align:center;
+    padding:20px;
+    margin-top:40px;
+}
+
+@media(max-width:768px){
+
+    nav{
+        flex-direction:column;
+    }
+
+    nav ul{
+        margin-top:15px;
+    }
+
+}
+
+</style>
+
+</head>
+<body>
+
+<nav>
+
+<div class="logo">🍱 PCCOE/DYP Mess Finder</div>
+
+<ul>
+    <li><a href="index.html">Home</a></li>
+    <li><a href="messes.html">Messes</a></li>
+    <li><a href="contact.html">Contact</a></li>
+</ul>
+
+</nav>
+
+<div class="contact-container">
+
+<div class="contact-box">
+
+<h1>📞 Contact Us</h1>
+
+<div class="contact-info">
+<p>📱 Phone: +91 9022049719</p>
+<p>📧 Email: punemessfinder@gmail.com</p>
+<p>📍 Pune, Maharashtra</p>
+</div>
+
+<input type="text" placeholder="Your Name">
+
+<input type="email" placeholder="Your Email">
+
+<textarea rows="6" placeholder="Write Your Message"></textarea>
+
+<button onclick="sendMessage()">
+Send Message
+</button>
+
+</div>
+
+</div>
+
+<footer>
+© 2026 PCCOE/DYP Mess Finder
+</footer>
+
+<script>
+
+async function sendMessage(){
+
+let nameBox = document.querySelector('input[type="text"]');
+let emailBox = document.querySelector('input[type="email"]');
+let messageBox = document.querySelector('textarea');
+
+let name = nameBox.value.trim();
+let email = emailBox.value.trim();
+let message = messageBox.value.trim();
+
+if(!name || !email || !message){
+alert("Please enter your name, email and message.");
+return;
+}
+
+if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+alert("Please enter a valid email address.");
+return;
+}
+
+let sendBtn = document.querySelector(".contact-box button");
+sendBtn.disabled = true;
+
+try{
+
+let res = await fetch("/api/contact", {
+method: "POST",
+headers: { "Content-Type": "application/json" },
+body: JSON.stringify({ name: name, email: email, message: message })
+});
+
+if(!res.ok){
+let data = await res.json().catch(() => ({}));
+throw new Error(data.error || "Failed");
+}
+
+alert("Thank you! Your message has been sent successfully.");
+
+nameBox.value = "";
+emailBox.value = "";
+messageBox.value = "";
+
+}catch(error){
+
+alert("Sorry, your message could not be sent. Please try again later.");
+
+}finally{
+
+sendBtn.disabled = false;
+
+}
+
+}
+
+</script>
+
+</body>
+</html>

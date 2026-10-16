@@ -1,0 +1,1207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PCCOE/DYP Mess Finder</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<!-- Navbar -->
+<nav>
+
+    <div class="logo">
+        🍱 PCCOE/DYP Mess Finder
+    </div>
+
+    <button class="menu-toggle" onclick="toggleMenu()">
+        ☰
+    </button>
+
+    <div class="nav-menu" id="navMenu">
+
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="contact.html">Contact</a></li>
+            <li><a href="owner-login.html">Owner Login</a></li>
+            <li><a href="login.html">Admin Login</a></li>
+        </ul>
+
+        <div class="nav-controls">
+
+            <button id="themeBtn" onclick="toggleTheme()">
+                🌙 Dark Mode
+            </button>
+
+            <select id="language" onchange="changeLanguage()">
+                <option value="en">English</option>
+                <option value="mr">मराठी</option>
+                <option value="hi">हिन्दी</option>
+            </select>
+
+        </div>
+
+    </div>
+
+</nav>
+
+<!-- Hero Section -->
+<section class="hero">
+
+    <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1200"
+    class="hero-img" alt="Food">
+
+    <h1>Find the Best Mess Near Your College</h1>
+
+    <p>
+        Search affordable and hygienic messes across Pune.
+
+Discover the best Veg & Non-Veg messes, dining halls and student meal services.
+    </p>
+
+    <button class="btn" onclick="openMessFilters()">
+Explore Now
+</button>
+<br><br>
+
+<button class="btn" onclick="openNearbyFilter()">
+📍 Find Messes Near Me
+</button>
+
+<div id="nearbyFilter" style="display:none; margin-top:20px;">
+
+    <h3>🔎 Find Messes Near You</h3>
+
+    <button onclick="getCurrentLocation()">
+        📍 Use My Current Location
+    </button>
+
+    <br><br>
+
+    <label><b>💰 Price</b></label>
+    <select id="priceFilter">
+    <option value="All">All Prices</option>
+    <option value="50">₹50 or below</option>
+    <option value="50-70">₹50–₹70</option>
+    <option value="70-90">₹70–₹90</option>
+    <option value="90-100">₹90–₹100</option>
+    <option value="100-120">₹100–₹120</option>
+    <option value="120-150">₹120–₹150</option>
+    <option value="150+">₹150+</option>
+</select>
+
+    <br><br>
+
+    <label><b>🍛 Food Type</b></label>
+    <select id="typeFilter">
+        <option value="all">Veg & Non-Veg</option>
+        <option value="Veg">🟢 Veg</option>
+        <option value="Non-Veg">🔴 Non-Veg</option>
+    </select>
+
+    <br><br>
+
+    <button class="btn" onclick="searchNearbyMesses()">
+        🔍 Find Messes
+    </button>
+
+</div>
+
+<p id="locationResult"></p>
+</section>
+<!-- Mess Filter Screen -->
+<div id="messFilterScreen" style="
+    display:none;
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:#121c2f;
+    z-index:9999;
+    padding:40px 20px;
+    text-align:center;
+    box-sizing:border-box;
+    overflow-y:auto;
+">
+
+    <h2>🍛 Find Mess Near You</h2>
+
+    <p>Select your preferred distance, price and food type.</p>
+
+<button class="btn" onclick="getUserLocation()">
+    📍 Use My Current Location
+</button>
+
+<p id="userLocationStatus">
+    Location not selected
+</p>
+    <!-- Distance -->
+    <h3>📍 Distance</h3>
+    <select id="distanceFilter">
+        <option value="0.25">250 m</option>
+        <option value="0.5">500 m</option>
+        <option value="0.75">750 m</option>
+        <option value="1">1 km</option>
+        <option value="1.5">1.5 km</option>
+    </select>
+
+    <!-- Price -->
+    <h3>💰 Price per meal</h3>
+    <select id="priceFilter">
+        <option value="All">All Prices</option>
+        <option value="50">₹50 or below</option>
+        <option value="50-70">₹50–₹70</option>
+        <option value="70-90">₹70–₹90</option>
+        <option value="90-100">₹90–₹100</option>
+        <option value="100-120">₹100–₹120</option>
+        <option value="120-150">₹120–₹150</option>
+        <option value="150+">₹150+</option>
+    </select>
+
+    <!-- Food Type -->
+    <h3>🍽️ Food Type</h3>
+    <select id="foodTypeFilter">
+        <option value="All">All</option>
+        <option value="Veg">Veg</option>
+        <option value="Non-Veg">Non-Veg</option>
+    </select>
+
+    <br><br>
+
+    <button class="btn" onclick="findFilteredMesses()">
+        🔍 Find Messes
+    </button>
+
+    <button class="btn" onclick="closeMessFilters()">
+        ← Back
+    </button>
+
+    <div id="filteredMessResults"></div>
+
+</div>
+
+
+<!-- Featured Messes -->
+<section id="messes">
+
+    <h2>Featured Messes</h2>
+
+    <div class="college-container">
+
+        <div class="college-card">
+            <h3>Patil Mess</h3>
+            <p>₹3000 / Month</p>
+            <p>⭐ 4.5 Rating</p>
+        </div>
+
+        <div class="college-card">
+            <h3>Hotel Morya & Mess</h3>
+            <p>₹3200 / Month</p>
+            <p>⭐ 4.7 Rating</p>
+        </div>
+
+        <div class="college-card">
+            <h3>Vaishnavi Mess</h3>
+            <p>₹3500 / Month</p>
+            <p>⭐ 4.6 Rating</p>
+        </div>
+
+    </div>
+
+</section>
+
+<!-- About Section -->
+<section id="about">
+<section id="favorites">
+
+    <h2>❤️ Favorite Messes</h2>
+
+    <div id="favoriteList">
+        No favorites added yet
+    </div>
+
+</section>
+<section id="about">
+
+    <h2>About Us</h2>
+
+    <div class="college-card">
+
+        <p>
+            Pune Student Mess Finder helps students find affordable,
+            hygienic and nearby mess facilities around colleges in Pune.
+        </p>
+
+        <br>
+
+        <p>
+            Students can view mess menus, pricing,
+            locations and WhatsApp contacts in one place.
+        </p>
+
+    </div>
+
+</section>
+
+<!-- Testimonials -->
+<section id="testimonials">
+
+    <h2>Student Reviews</h2>
+
+    <div class="college-container">
+
+        <div class="college-card">
+            <h3>Rahul</h3>
+            <p>⭐⭐⭐⭐⭐</p>
+            <p>
+                Found a great mess near PCCOE.
+                Very useful website.
+            </p>
+        </div>
+
+        <div class="college-card">
+            <h3>Priya</h3>
+            <p>⭐⭐⭐⭐⭐</p>
+            <p>
+                Easy to find veg messes and
+                contact owners directly.
+            </p>
+        </div>
+
+        <div class="college-card">
+            <h3>Amit</h3>
+            <p>⭐⭐⭐⭐</p>
+            <p>
+                Weekly menu feature is very helpful.
+            </p>
+        </div>
+
+    </div>
+
+</section>
+<section id="suggestion">
+
+    <h2>💡 Suggestions</h2>
+
+    <textarea
+    id="suggestionText"
+    rows="4"
+    placeholder="Give your suggestions"></textarea>
+
+    <br><br>
+
+    <button onclick="saveSuggestion()">
+        Submit Suggestion
+    </button>
+    </section>
+    
+<section>
+
+<h2>📊 Website Statistics</h2>
+
+<div class="college-container">
+
+<div class="college-card">
+<h3 id="totalMesses">0</h3>
+<p>Total Messes</p>
+</div>
+
+<div class="college-card">
+<h3 id="vegMesses">0</h3>
+<p>Veg</p>
+</div>
+
+<div class="college-card">
+<h3 id="nonVegMesses">0</h3>
+<p>Non Veg</p>
+</div>
+
+</div>
+
+</section>
+<!-- Footer -->
+<footer>
+
+    <h3>🍱 PCCOE/DYP Mess Finder</h3>
+
+    <p>
+        Helping students find affordable and hygienic messes.
+    </p>
+
+    <br>
+
+    <p>📧 punemessfinder@gmail.com</p>
+    <p>📞 +91 9022049719</p>
+    <p>📍 Pune, Maharashtra</p>
+
+    <br>
+
+    <div style="max-width:800px; margin:0 auto; text-align:left; font-size:14px; line-height:1.6;">
+
+        <h3 style="text-align:center;">📜 Terms & Conditions</h3>
+
+        <p>1. Mess Finder is a free directory. We do not cook, sell or deliver food, and any deal, payment or food quality issue is between you and the mess.</p>
+
+        <p>2. Prices, menus, ratings and timings may be out of date and can change without notice. Please confirm with the mess before paying or joining a plan.</p>
+
+        <p>3. Mess owners must give accurate details, keep their login private, and may register only a mess they own or are authorised to manage.</p>
+
+        <p>4. Ratings, favourites and theme/language choices are saved in your own browser. Please do not submit false or abusive ratings or suggestions.</p>
+
+        <p>5. Location is used only on your device to find nearby messes. We do not store it.</p>
+
+        <p>6. The site is provided "as is". We are not liable for any loss, illness or dispute from using it or dealing with any listed mess.</p>
+
+    </div>
+
+    <br>
+
+</footer>
+
+<script>
+
+// Shared user location (was local to getUserLocation, so it was always lost)
+let userLatitude = null;
+let userLongitude = null;
+
+function toggleTheme(){
+
+    document.body.classList.toggle("light-mode");
+
+    let btn = document.getElementById("themeBtn");
+
+    if(document.body.classList.contains("light-mode")){
+        localStorage.setItem("theme","light");
+        btn.innerHTML="☀️ Light Mode";
+    }else{
+        localStorage.setItem("theme","dark");
+        btn.innerHTML="🌙 Dark Mode";
+    }
+}
+
+window.onload = function(){
+
+    let savedTheme = localStorage.getItem("theme");
+
+    if(savedTheme==="light"){
+
+        document.body.classList.add("light-mode");
+
+        let btn = document.getElementById("themeBtn");
+
+        if(btn){
+            btn.innerHTML="☀️ Light Mode";
+        }
+    }
+
+    loadStatistics();
+    loadFavorites();
+}
+function findLocation(){
+
+    if(navigator.geolocation){
+
+        navigator.geolocation.getCurrentPosition(function(position){
+
+            let lat = position.coords.latitude;
+            let lng = position.coords.longitude;
+
+            window.open(
+                `https://www.google.com/maps/search/mess+near+me/@${lat},${lng},15z`,
+                "_blank"
+            );
+
+        });
+
+    }else{
+
+        alert("Geolocation not supported");
+
+    }
+
+}
+function loadStatistics(){
+
+document.getElementById("totalMesses").innerText =
+document.querySelectorAll("#messList .mess-item").length;
+document.getElementById("vegMesses").innerText =
+document.querySelectorAll("#messList .mess-item.veg").length;
+document.getElementById("nonVegMesses").innerText =
+document.querySelectorAll("#messList .mess-item.nonveg").length;
+
+}
+async function saveSuggestion(){
+
+    let suggestion =
+    document.getElementById(
+    "suggestionText"
+    ).value.trim();
+
+    if(suggestion === ""){
+        alert("Please write your suggestion first.");
+        return;
+    }
+
+    try{
+        let res = await fetch("/api/suggestion", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ suggestion: suggestion })
+        });
+
+        if(!res.ok){
+            throw new Error("Failed");
+        }
+    }catch(error){
+        alert("Sorry, your suggestion could not be sent. Please try again later.");
+        return;
+    }
+
+    let suggestions =
+    JSON.parse(
+    localStorage.getItem(
+    "suggestions"
+    )) || [];
+
+    suggestions.push(suggestion);
+
+    localStorage.setItem(
+    "suggestions",
+    JSON.stringify(suggestions)
+    );
+
+    alert("Suggestion Submitted");
+
+    document.getElementById(
+    "suggestionText"
+    ).value="";
+}
+function changeLanguage(){
+
+let lang =
+document.getElementById("language").value;
+
+if(lang==="mr"){
+
+document.querySelector(".hero h1").innerText =
+"तुमच्या कॉलेजजवळील सर्वोत्तम मेस शोधा";
+
+document.querySelector(".hero p").innerText =
+"PCCOE, DY Patil आणि VIT Pune जवळील परवडणाऱ्या मेस शोधा";
+
+}
+
+else if(lang==="hi"){
+
+document.querySelector(".hero h1").innerText =
+"अपने कॉलेज के पास सबसे अच्छी मेस खोजें";
+
+document.querySelector(".hero p").innerText =
+"PCCOE, DY Patil और VIT Pune के पास सस्ती मेस खोजें";
+
+}
+
+else{
+
+document.querySelector(".hero h1").innerText =
+"Find the Best Mess Near Your College";
+
+document.querySelector(".hero p").innerText =
+"Search affordable and hygienic messes near PCCOE, DY Patil Akurdi and VIT Pune.";
+
+}
+
+}
+function toggleMenu(){
+
+    document
+    .getElementById("navMenu")
+    .classList.toggle("active");
+
+}
+function loadFavorites(){
+
+    let favorites =
+    JSON.parse(localStorage.getItem("favorites")) || [];
+
+    let favoriteList =
+    document.getElementById("favoriteList");
+
+    if(favorites.length === 0){
+
+        favoriteList.innerHTML =
+        "No favorites added yet";
+
+        return;
+    }
+
+    favoriteList.innerHTML = "";
+
+    favorites.forEach(name => {
+
+        let item =
+        document.createElement("div");
+
+        item.className = "college-card";
+
+        item.innerHTML = `
+    <h3>❤️ ${name}</h3>
+
+    <a href="messes.html" class="btn">
+        Explore Now
+    </a>
+
+    
+`;
+
+        favoriteList.appendChild(item);
+
+    });
+}
+function closeMessFilters() {
+    document.getElementById("messFilterScreen").style.display = "none";
+}
+
+async function getCoordinates(location) {
+
+    try {
+
+        const response = await fetch(
+            "https://nominatim.openstreetmap.org/search?format=json&limit=1&q=" +
+            encodeURIComponent(location + ", Pune, Maharashtra, India")
+        );
+
+        const data = await response.json();
+
+        if (data.length === 0) {
+            return null;
+        }
+
+        return {
+            lat: parseFloat(data[0].lat),
+            lon: parseFloat(data[0].lon)
+        };
+
+    } catch (error) {
+
+        console.log("Location lookup failed:", location);
+        return null;
+    }
+}
+
+function calculateDistance(lat1, lon1, lat2, lon2) {
+
+    const R = 6371; // Earth radius in km
+
+    const dLat =
+        (lat2 - lat1) * Math.PI / 180;
+
+    const dLon =
+        (lon2 - lon1) * Math.PI / 180;
+
+    const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(lat1 * Math.PI / 180) *
+        Math.cos(lat2 * Math.PI / 180) *
+        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+
+    const c =
+        2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+    return R * c;
+}
+
+function findFilteredMesses() {
+
+    const resultBox =
+        document.getElementById("filteredMessResults");
+
+    const priceValue =
+        document.querySelector(
+            "#messFilterScreen #priceFilter"
+        ).value;
+
+    const foodType =
+        document.getElementById("foodTypeFilter").value;
+
+
+    // Existing messes
+    const messes = [
+
+        {
+            id: "patilMess",
+            name: "Patil Mess",
+            location: "Pune",
+            mealPrice: "₹3000 per month",
+            type: "Veg"
+        },
+
+        {
+            id: "moryaMess",
+            name: "Hotel Morya & Mess",
+            location: "Pune",
+            mealPrice: "₹3200 per month",
+            type: "Veg"
+        },
+
+        {
+            id: "vaishnaviMess",
+            name: "Vaishnavi Mess",
+            location: "Pune",
+            mealPrice: "₹3500 per month",
+            type: "Non-Veg"
+        },
+
+        {
+            id: "dharmarajMess",
+            name: "Dharmaraj Hotel",
+            location: "Pune",
+            mealPrice: "See details",
+            type: "Non-Veg"
+        },
+
+        {
+            id: "vakratundaMess",
+            name: "Vakratunda",
+            location: "Pune",
+            mealPrice: "₹3000 per month",
+            type: "Veg"
+        },
+
+        {
+            id: "shivbhumiMess",
+            name: "Hotel Shivbhumi & Mess",
+            location: "Pune",
+            mealPrice: "₹100 - ₹180 per meal",
+            type: "Non-Veg"
+        },
+
+        {
+            id: "payalMess",
+            name: "Payal Khanaval",
+            location: "Pune",
+            mealPrice: "₹80 - ₹150 per meal",
+            type: "Non-Veg"
+        },
+
+        {
+            id: "nagdevMess",
+            name: "Nagdev Hotel",
+            location: "Pune",
+            mealPrice: "₹50 - ₹150 per meal",
+            type: "Non-Veg"
+        },
+
+        {
+            id: "aaswadMess",
+            name: "Aaswad Hotel & Family Restaurant",
+            location: "Pune",
+            mealPrice: "₹40 - ₹170 per meal",
+            type: "Non-Veg"
+        },
+
+        {
+            id: "aarambhMess",
+            name: "Hotel Aarambh",
+            location: "Pune",
+            mealPrice: "₹10 - ₹120 per meal",
+            type: "Non-Veg"
+        },
+
+        {
+            id: "christyMess",
+            name: "Christy Restaurant",
+            location: "Pune",
+            mealPrice: "₹10 - ₹260 per meal",
+            type: "Non-Veg"
+        },
+
+        {
+            id: "maitriMess",
+            name: "Maitri Katta",
+            location: "Pune",
+            mealPrice: "₹30 - ₹120 per meal",
+            type: "Veg"
+        },
+
+        {
+            id: "swagatMess",
+            name: "Swagat Gharghuti Mess",
+            location: "Pune",
+            mealPrice: "₹10 - ₹130 per meal",
+            type: "Non-Veg"
+        },
+
+        {
+            id: "swamiMess",
+            name: "Shree Swami Samarth",
+            location: "Pune",
+            mealPrice: "₹40 - ₹140 per meal",
+            type: "Veg"
+        },
+
+        {
+            id: "sugamMess",
+            name: "Sugam Dining Hall",
+            location: "Pune",
+            mealPrice: "₹50 - ₹150 per meal",
+            type: "Veg"
+        },
+
+        {
+            id: "jaimalharMess",
+            name: "Jai Malhar Hotel & Mess",
+            location: "Pune",
+            mealPrice: "₹60 per meal",
+            type: "Veg & Non-Veg"
+        }
+
+    ];
+
+
+    // Price filtering
+    function priceMatches(mess) {
+
+        // Show all prices
+        if (priceValue === "All") {
+            return true;
+        }
+
+        // Extract numbers from price
+        const numbers =
+            mess.mealPrice.match(/\d+/g);
+
+        // Monthly plans are not used for
+        // per-meal filtering
+        if (!numbers || /month/i.test(mess.mealPrice)) {
+            return false;
+        }
+
+        const minPrice =
+            parseInt(numbers[0]);
+
+        const maxPrice =
+            numbers.length > 1
+            ? parseInt(numbers[1])
+            : minPrice;
+
+
+        if (priceValue === "50") {
+            return minPrice <= 50;
+        }
+
+        if (priceValue === "50-70") {
+            return maxPrice >= 50 &&
+                   minPrice <= 70;
+        }
+
+        if (priceValue === "70-90") {
+            return maxPrice >= 70 &&
+                   minPrice <= 90;
+        }
+
+        if (priceValue === "90-100") {
+            return maxPrice >= 90 &&
+                   minPrice <= 100;
+        }
+
+        if (priceValue === "100-120") {
+            return maxPrice >= 100 &&
+                   minPrice <= 120;
+        }
+
+        if (priceValue === "120-150") {
+            return maxPrice >= 120 &&
+                   minPrice <= 150;
+        }
+
+        if (priceValue === "150+") {
+            return maxPrice >= 150;
+        }
+
+        return true;
+    }
+
+
+    // Food type filtering
+    function foodMatches(mess) {
+
+        if (foodType === "All") {
+            return true;
+        }
+
+        if (mess.type === "Veg & Non-Veg") {
+            return true;
+        }
+
+        return mess.type === foodType;
+    }
+
+
+    // Distance filtering (only when the user shared a location
+    // and the mess has lat / lon saved)
+    const maxDistance =
+        parseFloat(document.getElementById("distanceFilter").value);
+
+    function distanceMatches(mess) {
+
+        if (userLatitude === null || userLongitude === null) {
+            return true;
+        }
+
+        if (typeof mess.lat !== "number" ||
+            typeof mess.lon !== "number") {
+            return true;
+        }
+
+        return calculateDistance(
+            userLatitude, userLongitude,
+            mess.lat, mess.lon
+        ) <= maxDistance;
+    }
+
+
+    // Apply filters
+    const filteredMesses =
+        messes.filter(mess =>
+            priceMatches(mess) &&
+            foodMatches(mess) &&
+            distanceMatches(mess)
+        );
+
+
+    console.log(
+        "Filtered messes:",
+        filteredMesses
+    );
+
+
+    // Display result
+    showFilteredMessResults(filteredMesses);
+}
+
+function showFilteredMessResults(messes) {
+
+    const resultBox =
+        document.getElementById("filteredMessResults");
+
+    if (!messes || messes.length === 0) {
+
+        resultBox.innerHTML = `
+            <div style="
+                background:white;
+                color:#222;
+                padding:20px;
+                margin-top:25px;
+                border-radius:15px;
+            ">
+                <h3>😔 No Mess Found</h3>
+                <p>Try changing your filters.</p>
+            </div>
+        `;
+
+        return;
+    }
+
+    resultBox.innerHTML = `
+        <h2 style="
+            margin-top:30px;
+            color:white;
+        ">
+            🍛 Available Messes (${messes.length})
+        </h2>
+    `;
+
+    messes.forEach(mess => {
+
+        resultBox.innerHTML += `
+            <div
+                onclick="window.location.href='messes.html#${mess.id}'"
+                style="
+                    background:white;
+                    color:#222;
+                    margin:15px auto;
+                    padding:20px;
+                    border-radius:15px;
+                    max-width:650px;
+                    text-align:left;
+                    box-shadow:0 5px 15px rgba(0,0,0,0.25);
+                    cursor:pointer;
+                    transition:0.2s;
+                "
+                onmouseover="this.style.transform='scale(1.02)'"
+                onmouseout="this.style.transform='scale(1)'"
+            >
+
+                <h3 style="
+                    margin-top:0;
+                    color:#111;
+                ">
+                    🍛 ${mess.name}
+                </h3>
+
+                <p>
+                    📍 <b>Location:</b>
+                    ${mess.location || "Pune"}
+                </p>
+
+                <p>
+                    🍽️ <b>Food Type:</b>
+                    ${mess.type || "Not specified"}
+                </p>
+
+                <p>
+                    💰 <b>Price:</b>
+                    ${mess.mealPrice || "See mess details"}
+                </p>
+
+                <p style="
+                    color:#0066cc;
+                    font-weight:bold;
+                ">
+                    👉 Click to view full mess details
+                </p>
+
+            </div>
+        `;
+    });
+}
+
+function requestUserLocation(statusId) {
+
+    const status = document.getElementById(statusId);
+
+    if (!navigator.geolocation) {
+        status.innerText =
+            "❌ Location is not supported by your browser.";
+        return;
+    }
+
+    status.innerText =
+        "📍 Getting your location...";
+
+    navigator.geolocation.getCurrentPosition(
+        function(position) {
+
+            userLatitude = position.coords.latitude;
+            userLongitude = position.coords.longitude;
+
+            status.innerText =
+                "✅ Location selected successfully";
+
+            console.log("Latitude:", userLatitude);
+            console.log("Longitude:", userLongitude);
+        },
+
+        function(error) {
+
+            status.innerText =
+                "❌ Please allow location access.";
+        }
+    );
+}
+
+function getUserLocation() {
+    requestUserLocation("userLocationStatus");
+}
+
+// "Find Messes Near Me" section on the home page
+// (these three functions were called in the HTML but never defined)
+function openNearbyFilter() {
+
+    const box = document.getElementById("nearbyFilter");
+
+    box.style.display =
+        box.style.display === "none" ? "block" : "none";
+}
+
+function getCurrentLocation() {
+    requestUserLocation("locationResult");
+}
+
+function searchNearbyMesses() {
+
+    // Copy the home-page filters into the main filter screen and open it
+    document.querySelector("#messFilterScreen #priceFilter").value =
+        document.querySelector("#nearbyFilter #priceFilter").value;
+
+    const type = document.getElementById("typeFilter").value;
+
+    document.getElementById("foodTypeFilter").value =
+        type === "all" ? "All" : type;
+
+    openMessFilters();
+}
+</script>
+<script>
+
+async function openMessFilters() {
+
+    document.getElementById("messFilterScreen").style.display = "block";
+
+    // Load all existing messes immediately
+    await findFilteredMesses();
+}
+
+function closeMessList(){
+    document.getElementById("messPopup").style.display="none";
+}
+
+function searchPopupMess(){
+
+    let input =
+    document.getElementById("popupSearch")
+    .value.toLowerCase();
+
+    let items =
+    document.querySelectorAll("#messList .mess-item")
+
+    items.forEach(item=>{
+
+        if(item.innerText.toLowerCase().includes(input)){
+            item.style.display="block";
+        }
+        else{
+            item.style.display="none";
+        }
+
+    });
+
+}
+
+function popupFilter(type){
+
+    let items =
+    document.querySelectorAll("#messList .mess-item")
+
+    items.forEach(item=>{
+
+        if(type==="all"){
+            item.style.display="block";
+        }
+        else if(item.classList.contains(type)){
+            item.style.display="block";
+        }
+        else{
+            item.style.display="none";
+        }
+
+    });
+
+}
+
+</script>
+<div id="messPopup" class="popup">
+
+<div class="popup-content">
+
+<span class="close" onclick="closeMessList()">&times;</span>
+
+<h2>🍱 Available Messes</h2>
+
+<div class="search-box">
+<input type="text"
+id="popupSearch"
+placeholder="Search Mess..."
+onkeyup="searchPopupMess()">
+</div>
+
+<div class="filter-buttons">
+<button onclick="popupFilter('all')">All</button>
+<button onclick="popupFilter('veg')">🟢 Veg</button>
+<button onclick="popupFilter('nonveg')">🔴 Non-Veg</button>
+</div>
+
+<div id="messList">
+
+<div class="mess-item veg"
+onclick="window.location.href='messes.html#patilMess'">
+▶ Patil Mess
+</div>
+
+<div class="mess-item veg"
+onclick="window.location.href='messes.html#moryaMess'">
+▶ Hotel Morya & Mess
+</div>
+
+<div class="mess-item nonveg"
+onclick="window.location.href='messes.html#vaishnaviMess'">
+▶ Vaishnavi Mess
+</div>
+
+<div class="mess-item nonveg"
+onclick="window.location.href='messes.html#dharmarajMess'">
+▶ Dharmaraj Hotel
+</div>
+
+<div class="mess-item veg"
+onclick="window.location.href='messes.html#vakratundaMess'">
+▶ Vakratunda
+</div>
+
+<div class="mess-item nonveg"
+onclick="window.location.href='messes.html#shivbhumiMess'">
+▶ Hotel Shivbhumi & Mess
+</div>
+
+<div class="mess-item nonveg"
+onclick="window.location.href='messes.html#payalMess'">
+▶ Payal Khanaval
+</div>
+
+<div class="mess-item nonveg"
+onclick="window.location.href='messes.html#nagdevMess'">
+▶ Nagdev Hotel
+</div>
+
+<div class="mess-item nonveg"
+onclick="window.location.href='messes.html#aaswadMess'">
+▶ Aaswad Hotel & Family Restaurant
+</div>
+
+<div class="mess-item nonveg"
+onclick="window.location.href='messes.html#aarambhMess'">
+▶ Hotel Aarambh
+</div>
+
+<div class="mess-item nonveg"
+onclick="window.location.href='messes.html#christyMess'">
+▶ Christy Restaurant
+</div>
+
+<div class="mess-item veg"
+onclick="window.location.href='messes.html#maitriMess'">
+▶ Maitri Katta
+</div>
+
+<div class="mess-item nonveg"
+onclick="window.location.href='messes.html#swagatMess'">
+▶ Swagat Gharghuti Mess
+</div>
+
+<div class="mess-item veg"
+onclick="window.location.href='messes.html#swamiMess'">
+▶ Shree Swami Samarth
+</div>
+
+<div class="mess-item veg"
+onclick="window.location.href='messes.html#sugamMess'">
+▶ Sugam Dining Hall
+</div>
+
+<div class="mess-item veg"
+onclick="window.location.href='messes.html#jaimalharMess'">
+▶ Jai Malhar Hotel & Mess
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,492 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Segoe UI',sans-serif;
+}
+
+body{
+    background:linear-gradient(135deg,#0f172a,#1e293b,#334155);
+    color:white;
+}
+
+/* Navbar */
+nav{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:20px 8%;
+    background:rgba(255,255,255,0.1);
+    backdrop-filter:blur(10px);
+    position:sticky;
+    top:0;
+    z-index:1000;
+}
+
+.logo{
+    font-size:24px;
+    font-weight:bold;
+}
+
+nav ul{
+    display:flex;
+    list-style:none;
+}
+
+nav ul li{
+    margin-left:25px;
+}
+
+nav ul li a{
+    text-decoration:none;
+    color:white;
+    font-weight:500;
+}
+
+nav ul li a:hover{
+    color:#38bdf8;
+}
+
+/* Hero Section */
+.hero{
+    min-height:90vh;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    text-align:center;
+    padding:20px;
+}
+
+.hero h1{
+    font-size:55px;
+    margin-bottom:20px;
+}
+
+.hero p{
+    font-size:20px;
+    max-width:700px;
+    margin-bottom:30px;
+}
+
+/* Button */
+.btn{
+    background:#38bdf8;
+    color:white;
+    text-decoration:none;
+    padding:14px 30px;
+    border-radius:30px;
+    display:inline-block;
+}
+
+.btn:hover{
+    background:#0ea5e9;
+}
+
+/* Sections */
+section{
+    padding:80px 8%;
+}
+
+section h2{
+    text-align:center;
+    margin-bottom:40px;
+    font-size:38px;
+}
+
+/* Cards */
+.college-container{
+    display:flex;
+    flex-direction:column;
+    gap:20px;
+}
+
+.college-card{
+    background:rgba(255,255,255,0.1);
+    border-radius:20px;
+    padding:30px;
+    text-align:center;
+    backdrop-filter:blur(12px);
+    border:1px solid rgba(255,255,255,0.2);
+    transition:0.3s;
+}
+.college-card{
+    width:100%;
+    max-width:900px;
+    margin:auto;
+}
+.college-card:hover{
+    transform:translateY(-10px);
+    transition:0.3s;
+}
+
+.college-card h3{
+    margin-bottom:15px;
+}
+
+.college-card p{
+    margin-bottom:15px;
+}
+
+/* Images */
+img{
+    width:100%;
+    height:520px;
+    object-fit:cover;
+    border-radius:15px;
+    margin-bottom:15px;
+}
+
+/* Veg Badge */
+.veg{
+    background:#16a34a;
+    padding:6px 12px;
+    border-radius:20px;
+    display:inline-block;
+    margin-bottom:10px;
+}
+
+/* Non Veg Badge */
+.nonveg{
+    background:#dc2626;
+    padding:6px 12px;
+    border-radius:20px;
+    display:inline-block;
+    margin-bottom:10px;
+}
+
+.search-box{
+    display:flex;
+    justify-content:center;
+    margin:20px auto;
+    width:100%;
+}
+.search-box input{
+    width:600px;
+    max-width:90%;
+    padding:15px;
+    border:none;
+    border-radius:30px;
+    font-size:16px;
+}
+
+/* Filter Buttons */
+.filter-buttons{
+    display:flex;
+    justify-content:center;
+    gap:15px;
+    margin-bottom:30px;
+    flex-wrap:wrap;
+}
+
+.filter-buttons button{
+    padding:10px 20px;
+    margin:5px;
+    border:none;
+    border-radius:20px;
+    cursor:pointer;
+}
+
+/* Footer */
+footer{
+    text-align:center;
+    padding:25px;
+    background:rgba(255,255,255,0.08);
+}
+
+/* Mobile */
+@media(max-width:768px){
+
+    nav{
+        flex-direction:column;
+    }
+
+    nav ul{
+        margin-top:15px;
+        flex-wrap:wrap;
+        justify-content:center;
+    }
+
+    .hero h1{
+        font-size:38px;
+    }
+
+    .hero p{
+        font-size:16px;
+    }
+}
+
+/* Favorite Heart */
+
+.favorite{
+    font-size:28px;
+    cursor:pointer;
+    display:block;
+    margin:10px 0;
+    transition:0.3s;
+}
+
+.favorite:hover{
+    transform:scale(1.2);
+}
+/* =========================
+   Dark / Light Mode
+========================= */
+
+#themeBtn{
+    padding:10px 15px;
+    border:none;
+    border-radius:20px;
+    cursor:pointer;
+    background:#38bdf8;
+    color:white;
+    font-weight:bold;
+}
+
+#themeBtn:hover{
+    background:#0ea5e9;
+}
+
+/* Light Mode */
+
+.light-mode{
+    background:#f4f7fc;
+    color:#111827;
+}
+
+.light-mode nav{
+    background:white;
+}
+
+.light-mode nav ul li a{
+    color:#111827;
+}
+
+.light-mode .college-card{
+    background:white;
+    color:#111827;
+    border:1px solid #ddd;
+}
+
+.light-mode footer{
+    background:#e5e7eb;
+    color:#111827;
+}
+
+.light-mode .btn{
+    background:#2563eb;
+}
+
+.light-mode .logo{
+    color:#111827;
+}
+
+.light-mode h1,
+.light-mode h2,
+.light-mode h3,
+.light-mode p{
+    color:#111827;
+}
+/* ==============================
+   MOBILE HAMBURGER NAVIGATION
+============================== */
+
+.menu-toggle{
+    display:none;
+    border:none;
+    background:transparent;
+    color:white;
+    font-size:30px;
+    cursor:pointer;
+    padding:5px;
+}
+
+.nav-menu{
+    display:flex;
+    align-items:center;
+    gap:20px;
+}
+
+.nav-controls{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+#language{
+    padding:8px 12px;
+    border:none;
+    border-radius:20px;
+    cursor:pointer;
+}
+
+/* Mobile */
+@media(max-width:768px){
+
+    nav{
+        position:sticky;
+        top:0;
+        z-index:1000;
+        flex-direction:row;
+        justify-content:space-between;
+        padding:14px 18px;
+    }
+
+    .logo{
+        font-size:18px;
+        max-width:75%;
+    }
+
+    .menu-toggle{
+        display:block;
+    }
+
+    .nav-menu{
+        display:none;
+        position:absolute;
+        top:100%;
+        left:0;
+        width:100%;
+        background:#1e293b;
+        padding:20px;
+        flex-direction:column;
+        align-items:stretch;
+        box-shadow:0 5px 15px rgba(0,0,0,0.25);
+    }
+
+    .nav-menu.active{
+        display:flex;
+    }
+
+    .nav-menu ul{
+        display:flex;
+        flex-direction:column;
+        gap:0;
+        margin:0;
+        padding:0;
+    }
+
+    .nav-menu ul li{
+        margin:0;
+        text-align:center;
+        border-bottom:1px solid rgba(255,255,255,0.1);
+    }
+
+    .nav-menu ul li a{
+        display:block;
+        padding:12px;
+    }
+
+    .nav-controls{
+        flex-direction:column;
+        margin-top:15px;
+        width:100%;
+    }
+
+    #themeBtn,
+    #language{
+        width:100%;
+    }
+}
+
+/* Light mode mobile menu */
+.light-mode .nav-menu{
+    background:white;
+}
+
+.light-mode .menu-toggle{
+    color:#111827;
+}
+#locationResult{
+    background:#38bdf8;
+    padding:20px;
+    border-radius:20px;
+}
+/* Popup */
+
+.popup{
+display:none;
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.7);
+z-index:9999;
+overflow:auto;
+}
+
+.popup-content{
+background:#1e293b;
+width:90%;
+max-width:700px;
+margin:40px auto;
+padding:20px;
+border-radius:15px;
+color:white;
+max-height:85vh;
+overflow-y:auto;
+}
+
+.close{
+float:right;
+font-size:30px;
+font-weight:bold;
+cursor:pointer;
+}
+
+.close:hover{
+color:red;
+}
+
+#messList details{
+background:#334155;
+padding:15px;
+margin:10px 0;
+border-radius:10px;
+}
+
+#messList summary{
+cursor:pointer;
+font-size:18px;
+font-weight:bold;
+}
+
+#messList p{
+margin:8px 0;
+}
+.highlight{
+    border:4px solid #38bdf8;
+    box-shadow:0 0 20px #38bdf8;
+}
+#messes .college-container{
+    display:flex !important;
+    flex-direction:column !important;
+}
+
+#messes .college-card{
+    width:100% !important;
+    max-width:900px !important;
+    margin:20px auto !important;
+}
+
+/* Hide the empty blue bar when there is no location message */
+#locationResult:empty{
+    display:none;
+}
+
+/* Light mode: these areas keep a dark background, so keep their text light */
+.light-mode #messFilterScreen h2,
+.light-mode #messFilterScreen h3,
+.light-mode #messFilterScreen p,
+.light-mode #messFilterScreen label,
+.light-mode .popup-content h2,
+.light-mode .popup-content p{
+    color:white;
+}
+
+/* Light mode: badges sit on green / red, so keep their text white */
+.light-mode .veg,
+.light-mode .nonveg{
+    color:white;
+}

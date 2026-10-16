@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title> Mess Owner Dashboard</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Segoe UI,sans-serif;
+}
+
+body{
+background:#f4f7fc;
+padding:20px;
+}
+
+.card{
+max-width:800px;
+margin:auto;
+background:white;
+padding:25px;
+border-radius:15px;
+box-shadow:0 2px 10px rgba(0,0,0,0.1);
+}
+
+h1{
+text-align:center;
+margin-bottom:20px;
+}
+
+h2{
+margin-top:20px;
+margin-bottom:10px;
+}
+
+input,textarea{
+width:100%;
+padding:12px;
+margin:8px 0;
+border:1px solid #ddd;
+border-radius:8px;
+}
+
+button{
+padding:12px 20px;
+border:none;
+border-radius:8px;
+background:#38bdf8;
+color:white;
+cursor:pointer;
+margin-top:10px;
+}
+
+button:hover{
+background:#0ea5e9;
+}
+
+img{
+width:100%;
+max-height:250px;
+object-fit:cover;
+border-radius:10px;
+margin-top:10px;
+}
+
+.logout{
+background:red;
+}
+
+.review{
+border:1px solid #ddd;
+padding:10px;
+margin-top:10px;
+border-radius:10px;
+}
+#backBtn{
+    background:#64748b;
+    color:white;
+    padding:8px 15px;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+    margin-bottom:15px;
+}
+
+#backBtn:hover{
+    background:#475569;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+
+<button onclick="history.back()" id="backBtn">
+← Back
+</button>
+
+<h1>🏪 Mess Owner Dashboard</h1>
+
+<div id="messInfo"></div>
+
+<h2>📋 Weekly Menu</h2>
+<textarea id="menu" rows="5"></textarea>
+
+<h2>📞 Contact Number</h2>
+<input type="text" id="contactNumber">
+
+<h2>💬 WhatsApp Link</h2>
+<input type="text" id="whatsappLink">
+
+<h2>📍 Google Maps Link</h2>
+<input type="text" id="mapLink" placeholder="https://maps.app.goo.gl/...">
+
+<h2>🕒 Opening Time</h2>
+<input type="time" id="openTime">
+
+<h2>🕒 Closing Time</h2>
+<input type="time" id="closeTime">
+
+<h2>📸 Upload Photo</h2>
+
+<input
+type="file"
+id="messPhoto"
+accept="image/*"
+capture="environment"
+onchange="previewPhoto(event)">
+
+<img id="photoPreview" src="">
+
+<button onclick="saveDetails()">
+💾 Save Details
+</button>
+
+<h2>⭐ Reviews</h2>
+
+<div id="reviewSection">
+No Reviews Yet
+</div>
+
+<br>
+
+<button class="logout" onclick="logout()">
+🚪 Logout
+</button>
+
+</div>
+
+<script type="module">
+import {
+  db,
+  ref,
+  set,
+  get
+} from "./db.js";
+
+let ownerEmail =
+localStorage.getItem("ownerLoggedIn");
+
+if(!ownerEmail){
+alert("Please Login First");
+window.location.href="owner-login.html";
+}
+
+let ownerMess;
+
+// Escapes text before it is placed in the page
+function esc(value){
+    return String(value === undefined || value === null ? "" : value)
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#39;");
+}
+
+// Only load when logged in (otherwise ownerEmail is null and .replace crashes)
+if(ownerEmail){
+    loadOwnerData();
+}
+
+async function loadOwnerData(){
+
+    try{
+
+        const snapshot = await get(
+            ref(db,"messes/" + ownerEmail.replace(/[.@]/g,"_"))
+        );
+
+        if(!snapshot.exists()){
+            document.getElementById("messInfo").innerHTML =
+            "<h2>No Mess Found For This Account</h2>";
+            return;
+        }
+
+        ownerMess = snapshot.val();
+        loadData();
+
+    }catch(error){
+
+        console.error("Could not load mess:", error);
+        document.getElementById("messInfo").innerHTML =
+        "<h2>Could not load mess data. Please try again.</h2>";
+    }
+}
+function loadData(){
+
+document.getElementById("messInfo").innerHTML = `
+<h2>${esc(ownerMess.name)}</h2>
+<p><b>Location:</b> ${esc(ownerMess.location)}</p>
+<p><b>Price:</b> ${esc(ownerMess.price)}</p>
+<p><b>Type:</b> ${esc(ownerMess.type)}</p>
+`;
+
+document.getElementById("menu").value =
+ownerMess.menu || "";
+
+document.getElementById("contactNumber").value =
+ownerMess.contactNumber || "";
+
+document.getElementById("whatsappLink").value =
+ownerMess.whatsappLink || "";
+
+document.getElementById("mapLink").value =
+ownerMess.mapLink || "";
+
+document.getElementById("openTime").value =
+ownerMess.openTime || "";
+
+document.getElementById("closeTime").value =
+ownerMess.closeTime || "";
+
+document.getElementById("photoPreview").src =
+ownerMess.photo || "";
+
+showReviews();
+
+}
+
+function previewPhoto(event){
+
+let file =
+event.target.files[0];
+
+if(!file) return;
+
+if(!ownerMess){
+alert("Mess data not loaded yet");
+return;
+}
+
+let reader =
+new FileReader();
+
+reader.onload = function(e){
+
+// shrink the photo so it stays small in the database
+let img = new Image();
+
+img.onload = function(){
+
+let scale = Math.min(1, 1000 / Math.max(img.width, img.height));
+let canvas = document.createElement("canvas");
+canvas.width = Math.round(img.width * scale);
+canvas.height = Math.round(img.height * scale);
+canvas.getContext("2d").drawImage(img, 0, 0, canvas.width, canvas.height);
+
+let data = canvas.toDataURL("image/jpeg", 0.8);
+
+document.getElementById("photoPreview").src = data;
+ownerMess.photo = data;
+};
+
+img.src = e.target.result;
+};
+
+reader.readAsDataURL(file);
+}
+
+async function saveDetails(){
+
+    if(!ownerMess){
+        alert("Mess data not loaded yet");
+        return;
+    }
+
+ownerMess.menu =
+document.getElementById("menu").value;
+
+ownerMess.contactNumber =
+document.getElementById("contactNumber").value;
+
+ownerMess.whatsappLink =
+document.getElementById("whatsappLink").value;
+
+ownerMess.mapLink =
+document.getElementById("mapLink").value;
+
+ownerMess.openTime =
+document.getElementById("openTime").value;
+
+ownerMess.closeTime =
+document.getElementById("closeTime").value;
+
+// Save to MongoDB (through the server) - loadOwnerData() reads from the same place
+try{
+    await set(
+        ref(db,"messes/" + ownerEmail.replace(/[.@]/g,"_")),
+        ownerMess
+    );
+}catch(error){
+    alert("Error: " + error);
+    return;
+}
+
+alert("Details Saved Successfully ✅");
+}
+
+function showReviews(){
+
+let reviewDiv =
+document.getElementById("reviewSection");
+
+let reviews =
+Array.isArray(ownerMess.reviews)
+? ownerMess.reviews
+: Object.values(ownerMess.reviews || {});
+
+if(reviews.length === 0){
+reviewDiv.innerHTML =
+"No Reviews Yet";
+return;
+}
+
+let html = "";
+
+reviews.forEach(review => {
+
+html += `
+<div class="review">
+<p>⭐ ${esc(review.rating)}/5</p>
+<p>${esc(review.comment)}</p>
+</div>
+`;
+
+});
+
+reviewDiv.innerHTML = html;
+}
+
+function logout(){
+
+localStorage.removeItem(
+"ownerLoggedIn"
+);
+localStorage.removeItem("authToken");
+
+window.location.href =
+"owner-login.html";
+
+}
+
+window.saveDetails = saveDetails;
+window.previewPhoto = previewPhoto;
+window.logout = logout;
+</script>
+
+</body>
+</html>

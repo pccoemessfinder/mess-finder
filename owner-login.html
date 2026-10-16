@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Owner Login & Registration</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Segoe UI,sans-serif;
+}
+
+body{
+background:linear-gradient(135deg,#0f172a,#1e293b,#334155);
+min-height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+padding:20px;
+}
+
+.card{
+width:450px;
+background:white;
+padding:25px;
+border-radius:15px;
+box-shadow:0 5px 15px rgba(0,0,0,0.2);
+}
+
+h2{
+text-align:center;
+margin-bottom:15px;
+}
+
+input{
+width:100%;
+padding:12px;
+margin:8px 0;
+border:1px solid #ddd;
+border-radius:8px;
+}
+
+button{
+width:100%;
+padding:12px;
+margin-top:10px;
+border:none;
+border-radius:8px;
+background:#38bdf8;
+color:white;
+cursor:pointer;
+}
+
+button:hover{
+background:#0ea5e9;
+}
+
+#registerBox{
+display:none;
+margin-top:20px;
+}
+
+</style>
+</head>
+<body>
+
+<div class="card">
+
+<h2>🏪 Owner Login</h2>
+
+<input type="email" id="ownerEmail" placeholder="Owner Email">
+
+<input type="password" id="ownerPassword" placeholder="Owner Password">
+
+<button onclick="ownerLogin()">
+Login
+</button>
+<p style="margin-top:15px;">
+<a href="#" onclick="forgotPassword()">
+Forgot Password?
+</a>
+</p>
+<button onclick="showRegister()">
+➕ Register New Mess / Hotel
+</button>
+
+<div id="registerBox">
+
+<h2>Create Account</h2>
+
+<input type="text" id="newMessName" placeholder="Mess / Hotel Name">
+
+<input type="text" id="newLocation" placeholder="Location">
+
+<input type="text" id="newPrice" placeholder="Price">
+
+<input type="text" id="newType" placeholder="Veg / Non Veg">
+
+<input type="email" id="newEmail" placeholder="Owner Email">
+
+<input type="password" id="newPassword" placeholder="Owner Password">
+
+<button onclick="registerOwner()">
+✅ Create Account
+</button>
+
+</div>
+
+</div>
+
+<script type="module">
+    import {
+db,
+ref,
+set,
+get
+} from "./db.js";
+
+function showRegister(){
+
+document.getElementById(
+"registerBox"
+).style.display="block";
+
+}
+
+async function registerOwner(){
+
+try{
+
+let newMess = {
+
+name: document.getElementById("newMessName").value,
+location: document.getElementById("newLocation").value,
+price: document.getElementById("newPrice").value,
+type: document.getElementById("newType").value,
+
+ownerEmail: document.getElementById("newEmail").value.trim(),
+ownerPassword: document.getElementById("newPassword").value.trim(),
+
+menu:"",
+photo:"",
+contactNumber:"",
+whatsappLink:"",
+openTime:"",
+closeTime:"",
+reviews:[]
+};
+// An empty email would make the key "messes/" and overwrite EVERY mess
+if(!newMess.name.trim() || !newMess.ownerEmail || !newMess.ownerPassword){
+alert("Please enter mess name, owner email and password.");
+return;
+}
+
+const messKey =
+newMess.ownerEmail.replace(/[.@]/g,"_");
+
+// Do not overwrite an existing account
+const existing =
+await get(ref(db,"messes/" + messKey));
+
+if(existing.exists()){
+alert("An account with this email already exists. Please login.");
+return;
+}
+
+await set(
+ref(db,"messes/" + messKey),
+newMess
+);
+
+alert("Account Created Successfully ✅");
+
+}
+catch(error){
+
+alert("Error: " + error.message);
+console.log(error);
+
+}
+
+}
+async function ownerLogin(){
+
+let email =
+document.getElementById("ownerEmail").value.trim();
+
+let password =
+document.getElementById("ownerPassword").value.trim();
+
+if(!email || !password){
+alert("Please enter your email and password.");
+return;
+}
+
+try{
+
+const res = await fetch("/api/login", {
+method: "POST",
+headers: { "Content-Type": "application/json" },
+body: JSON.stringify({ username: email, password: password })
+});
+
+const data = await res.json().catch(() => ({}));
+
+if(!res.ok){
+alert(data.error || "Invalid email or password");
+return;
+}
+
+if(data.role !== "owner"){
+alert("Please use the Admin login page for admin accounts.");
+return;
+}
+
+localStorage.setItem("authToken", data.token);
+localStorage.setItem("ownerLoggedIn", data.email || email);
+
+window.location.href = "owner-dashboard.html";
+
+}catch(error){
+console.error(error);
+alert("Could not connect. Please try again.");
+}
+}
+
+function forgotPassword(){
+alert("To reset your password, please contact the admin using the Contact page.");
+}
+window.ownerLogin = ownerLogin;
+window.registerOwner = registerOwner;
+window.showRegister = showRegister;
+window.forgotPassword = forgotPassword;
+</script>
+
+</body>
+</html>

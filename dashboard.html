@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Segoe UI',sans-serif;
+}
+
+body{
+    background:#f4f7fc;
+    padding:30px;
+}
+
+h1{
+    text-align:center;
+    margin-bottom:30px;
+}
+
+.form-box{
+    max-width:700px;
+    margin:auto;
+    background:white;
+    padding:25px;
+    border-radius:15px;
+    box-shadow:0 2px 10px rgba(0,0,0,0.1);
+}
+
+.form-box label{
+    display:block;
+    margin-top:8px;
+    font-size:14px;
+    color:#555;
+}
+
+.form-box input,
+.form-box select{
+    width:100%;
+    box-sizing:border-box;
+    padding:12px;
+    margin:10px 0;
+    border:1px solid #ddd;
+    border-radius:8px;
+}
+
+button{
+    padding:12px 20px;
+    border:none;
+    border-radius:8px;
+    background:#38bdf8;
+    color:white;
+    cursor:pointer;
+}
+
+button:hover{
+    background:#0ea5e9;
+}
+
+.cards{
+    display:flex;
+    justify-content:center;
+    gap:20px;
+    margin:30px 0;
+    flex-wrap:wrap;
+}
+
+.card{
+    background:white;
+    width:220px;
+    padding:20px;
+    border-radius:15px;
+    text-align:center;
+    box-shadow:0 2px 10px rgba(0,0,0,0.1);
+}
+
+.card h2{
+    margin-bottom:10px;
+}
+
+h2{
+    text-align:center;
+    margin:30px 0;
+}
+
+.mess-card{
+    background:white;
+    max-width:700px;
+    margin:15px auto;
+    padding:20px;
+    border-radius:15px;
+    box-shadow:0 2px 10px rgba(0,0,0,0.1);
+}
+
+.mess-card h3{
+    margin-bottom:10px;
+}
+
+.logout{
+    display:block;
+    margin:20px auto;
+}
+
+</style>
+</head>
+
+<body>
+
+<h1>🍱 PCCOE/DYP Finder Dashboard</h1>
+
+<div class="form-box">
+
+    <input type="text" id="messName" placeholder="Mess Name">
+
+    <input type="text" id="messLocation" placeholder="Location">
+
+    <input type="text" id="messPrice" placeholder="Price (e.g. ₹3000 / Month)">
+
+    <select id="messType">
+        <option value="">Select Type</option>
+        <option value="Veg">Veg</option>
+        <option value="Non-Veg">Non-Veg</option>
+    </select>
+
+    <input type="email" id="ownerEmail" placeholder="Owner Email (used as owner login)">
+
+    <input type="password" id="ownerPassword" placeholder="Owner Password (min 6 characters)">
+
+    <input type="text" id="contactNumber" placeholder="Contact Number (optional)">
+
+    <input type="text" id="whatsappLink" placeholder="WhatsApp link, https://... (optional)">
+
+    <input type="text" id="mapLink" placeholder="Google Maps link, https://... (optional)">
+
+    <label>Opening Time</label>
+    <input type="time" id="openTime">
+
+    <label>Closing Time</label>
+    <input type="time" id="closeTime">
+
+    <button onclick="addMess()" id="addBtn">➕ Add Mess</button>
+
+    <button onclick="updateMess()" id="updateBtn" style="display:none;">
+    ✏️ Update Mess
+    </button>
+
+    <button onclick="resetForm()" id="cancelBtn" style="display:none;">
+    ✖ Cancel
+    </button>
+</div>
+
+<div class="cards">
+
+    <div class="card">
+        <h2 id="total">0</h2>
+        <p>Total Messes</p>
+    </div>
+
+    <div class="card">
+        <h2 id="vegCount">0</h2>
+        <p>Veg Messes</p>
+    </div>
+
+    <div class="card">
+        <h2 id="nonVegCount">0</h2>
+        <p>Non-Veg Messes</p>
+    </div>
+
+</div>
+
+<h2>Available Messes</h2>
+
+<div id="messList"></div>
+
+<button class="logout" onclick="logout()">
+🚪 Logout
+</button>
+
+<script>
+
+const API = "/api";
+
+function token(){
+    return localStorage.getItem("authToken") || "";
+}
+
+// Must be logged in as admin (login.html stores both of these)
+if(localStorage.getItem("adminLoggedIn") !== "true" || !token()){
+    window.location.href = "login.html";
+}
+
+let messes = [];      // loaded from MongoDB, never from the browser
+let editKey = null;   // key of the mess being edited
+
+// Prevents broken layout / script injection from typed values
+function esc(value){
+    return String(value === undefined || value === null ? "" : value)
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#39;");
+}
+
+function keyFromEmail(email){
+    return (email || "").trim().toLowerCase().replace(/[.@]/g,"_");
+}
+
+function validEmail(v){
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+}
+
+async function api(method, path, body){
+    const res = await fetch(API + path, {
+        method: method,
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + token()
+        },
+        body: body ? JSON.stringify(body) : undefined
+    });
+    const data = await res.json().catch(() => ({}));
+
+    if(res.status === 401){
+        alert("Your admin session has expired. Please log in again.");
+        logout();
+        throw new Error("Not logged in");
+    }
+    if(!res.ok){
+        throw new Error(data.error || "Request failed (" + res.status + ")");
+    }
+    return data;
+}
+
+async function loadMesses(){
+    try{
+        messes = await api("GET", "/admin/messes");
+        showMesses();
+    }catch(err){
+        console.error(err);
+        document.getElementById("messList").innerHTML =
+        "<p>Could not load messes. Please refresh the page.</p>";
+    }
+}
+
+function readForm(){
+    return {
+        name: document.getElementById("messName").value.trim(),
+        location: document.getElementById("messLocation").value.trim(),
+        price: document.getElementById("messPrice").value.trim(),
+        type: document.getElementById("messType").value,
+        contactNumber: document.getElementById("contactNumber").value.trim(),
+        whatsappLink: document.getElementById("whatsappLink").value.trim(),
+        mapLink: document.getElementById("mapLink").value.trim(),
+        openTime: document.getElementById("openTime").value,
+        closeTime: document.getElementById("closeTime").value
+    };
+}
+
+function resetForm(){
+    editKey = null;
+    ["messName","messLocation","messPrice","messType","ownerEmail","ownerPassword",
+     "contactNumber","whatsappLink","mapLink","openTime","closeTime"]
+    .forEach(id => { document.getElementById(id).value = ""; });
+
+    document.getElementById("ownerEmail").disabled = false;
+    document.getElementById("ownerPassword").placeholder =
+    "Owner Password (min 6 characters)";
+    document.getElementById("addBtn").style.display = "inline-block";
+    document.getElementById("updateBtn").style.display = "none";
+    document.getElementById("cancelBtn").style.display = "none";
+}
+
+async function addMess(){
+
+    const fields = readForm();
+    const email = document.getElementById("ownerEmail").value.trim().toLowerCase();
+    const password = document.getElementById("ownerPassword").value;
+
+    if(!fields.name){
+        alert("Enter Mess Name");
+        return;
+    }
+    if(!validEmail(email)){
+        alert("Enter a valid owner email");
+        return;
+    }
+    if(password.length < 6){
+        alert("Owner password must be at least 6 characters");
+        return;
+    }
+    if(messes.some(m => m.key === keyFromEmail(email))){
+        alert("A mess with this owner email already exists.");
+        return;
+    }
+
+    try{
+        await api("PUT", "/messes/" + keyFromEmail(email),
+            Object.assign({}, fields, { ownerEmail: email, ownerPassword: password }));
+        resetForm();
+        await loadMesses();
+        alert("Mess added successfully");
+    }catch(err){
+        if(err.message !== "Not logged in") alert("Error: " + err.message);
+    }
+}
+
+function editMess(index){
+
+    const m = messes[index];
+    editKey = m.key;
+
+    document.getElementById("messName").value = m.name || "";
+    document.getElementById("messLocation").value = m.location || "";
+    document.getElementById("messPrice").value = m.price || "";
+    document.getElementById("messType").value = m.type || "";
+    document.getElementById("contactNumber").value = m.contactNumber || "";
+    document.getElementById("whatsappLink").value = m.whatsappLink || "";
+    document.getElementById("mapLink").value = m.mapLink || "";
+    document.getElementById("openTime").value = m.openTime || "";
+    document.getElementById("closeTime").value = m.closeTime || "";
+
+    // The email is the owner's login id, so it cannot be changed here.
+    // The password is never shown; leave it blank to keep the current one.
+    document.getElementById("ownerEmail").value = m.ownerEmail || "";
+    document.getElementById("ownerEmail").disabled = true;
+    document.getElementById("ownerPassword").value = "";
+    document.getElementById("ownerPassword").placeholder =
+    "New password (leave blank to keep current)";
+
+    document.getElementById("addBtn").style.display = "none";
+    document.getElementById("updateBtn").style.display = "inline-block";
+    document.getElementById("cancelBtn").style.display = "inline-block";
+
+    window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+async function updateMess(){
+
+    if(!editKey) return;
+
+    const fields = readForm();
+    if(!fields.name){
+        alert("Enter Mess Name");
+        return;
+    }
+
+    const password = document.getElementById("ownerPassword").value;
+    if(password && password.length < 6){
+        alert("New password must be at least 6 characters");
+        return;
+    }
+    if(password){
+        fields.ownerPassword = password;
+    }
+
+    try{
+        await api("PUT", "/messes/" + editKey, fields);
+        resetForm();
+        await loadMesses();
+        alert("Mess Updated Successfully");
+    }catch(err){
+        if(err.message !== "Not logged in") alert("Error: " + err.message);
+    }
+}
+
+async function deleteMess(index){
+
+    const m = messes[index];
+
+    if(!confirm("Delete " + (m.name || "this mess") + "? This cannot be undone.")){
+        return;
+    }
+
+    try{
+        await api("DELETE", "/messes/" + m.key);
+        if(editKey === m.key) resetForm();
+        await loadMesses();
+    }catch(err){
+        if(err.message !== "Not logged in") alert("Error: " + err.message);
+    }
+}
+
+function showMesses(){
+
+    let html = "";
+
+    let total = messes.length;
+
+    let veg = messes.filter(
+        mess => (mess.type || "").trim().toLowerCase() === "veg"
+    ).length;
+
+    let nonVeg = messes.filter(
+        mess => (mess.type || "").trim().toLowerCase() === "non-veg"
+    ).length;
+
+    document.getElementById("total").innerText = total;
+    document.getElementById("vegCount").innerText = veg;
+    document.getElementById("nonVegCount").innerText = nonVeg;
+
+    if(total === 0){
+        document.getElementById("messList").innerHTML = "<p>No messes added yet.</p>";
+        return;
+    }
+
+    messes.forEach((mess,index)=>{
+
+        const reviews = Array.isArray(mess.reviews) ? mess.reviews : [];
+        const avg = reviews.length
+            ? (reviews.reduce((s,r) => s + Number(r.rating || 0), 0) / reviews.length).toFixed(1)
+            : null;
+
+        html += `
+<div class="mess-card">
+
+    <h3>${esc(mess.name)}</h3>
+
+    <p><b>Location:</b> ${esc(mess.location)}</p>
+
+    <p><b>Price:</b> ${esc(mess.price)}</p>
+
+    <p><b>Type:</b> ${esc(mess.type)}</p>
+
+    <p><b>Opening:</b> ${esc(mess.openTime || "-")}</p>
+
+    <p><b>Closing:</b> ${esc(mess.closeTime || "-")}</p>
+
+    <p><b>Owner Email:</b> ${esc(mess.ownerEmail || "-")}</p>
+
+    <p><b>Rating:</b> ${avg ? esc(avg) + " / 5 (" + reviews.length + ")" : "No ratings yet"}</p>
+
+    <button onclick="editMess(${index})">
+        ✏️ Edit
+    </button>
+    <button onclick="deleteMess(${index})">
+        ❌ Delete
+    </button>
+
+</div>
+`;
+    });
+
+    document.getElementById("messList").innerHTML = html;
+}
+
+function logout(){
+
+    localStorage.removeItem("adminLoggedIn");
+    localStorage.removeItem("authToken");
+
+    window.location.href = "login.html";
+}
+
+loadMesses();
+
+</script>
+
+</body>
+</html>

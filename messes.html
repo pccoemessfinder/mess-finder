@@ -1,0 +1,1859 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PCCOE/DYP Mess Finder</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<nav>
+    <div class="logo">🍱 PCCOE/DYP Mess Finder</div>
+
+   <ul>
+    <li><a href="index.html">Home</a></li>
+    <li><a href="contact.html">Contact</a></li>
+</ul>
+</nav>
+
+<section>
+
+<h2>Popular Messes Near Colleges</h2>
+
+
+<div class="search-box">
+    <input type="text" id="searchInput" placeholder="Search Mess Name..." onkeyup="searchMess()">
+</div>
+
+<div class="filter-buttons">
+    <button onclick="filterMess('all')">All</button>
+    <button onclick="filterMess('veg')">🟢 Veg</button>
+    <button onclick="filterMess('nonveg')">🔴 Non-Veg</button>
+</div>
+<div style="text-align:center; margin:20px 0;">
+    <button onclick="findLocation()" class="btn">
+        📍 Find Mess Near Me
+    </button>
+</div>
+
+<p id="locationResult"></p>
+<div class="college-container">
+
+    <!-- Patil Mess -->
+
+    <div class="college-card veg-card" id="patilMess">
+
+        <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=600" alt="Food">
+
+        <h3>Patil Mess</h3>
+        <span class="favorite" onclick="toggleFavorite(this)">
+❤️
+</span>
+
+        <span class="veg">🟢 Veg</span>
+
+        <p>📍 Akurdi, Pune</p>
+        <p>₹3000 / Month</p>
+        <p>
+⭐ Original Rating: 4.5
+</p>
+
+<p>
+    Your Rating: <span id="rating1">0</span>/5
+</p>
+
+<select id="ratingSelect1">
+    <option value="">Select Rating</option>
+    <option value="1">⭐ 1</option>
+    <option value="2">⭐⭐ 2</option>
+    <option value="3">⭐⭐⭐ 3</option>
+    <option value="4">⭐⭐⭐⭐ 4</option>
+    <option value="5">⭐⭐⭐⭐⭐ 5</option>
+</select>
+
+<button onclick="submitRating('Patil Mess','rating1','ratingSelect1','thankYou1')">
+    ⭐ Submit Rating
+</button>
+
+<p id="thankYou1"></p>
+        <h4>Today's Special</h4>
+
+        <p>
+            Paneer Butter Masala<br>
+            Jeera Rice<br>
+            Chapati<br>
+            Gulab Jamun
+        </p>
+
+        <button onclick="patilMenu()">📋 Weekly Menu</button>
+
+        <br><br>
+
+        <a href="https://maps.app.goo.gl/KU2DND6kNNtxrPSA6" target="_blank" class="btn">
+            📍 Real Location
+        </a>
+
+        <a href="https://wa.me/919876543210" target="_blank" class="btn">
+            💬 WhatsApp
+        </a>
+
+    </div>
+
+    <!-- Hotel Morya -->
+
+    <div class="college-card veg-card" id="moryaMess">
+
+        <img src="morya.jpg" alt="Hotel Morya & Mess">
+        <h3>Hotel Morya & Mess</h3>
+        <span class="favorite" onclick="toggleFavorite(this)">
+❤️
+</span>
+
+        <span class="veg">🟢 Pure Veg</span>
+
+        <p>📍 Akurdi, Pune</p>
+        <p>₹3200 / Month</p>
+       
+
+<p>
+⭐ Original Rating: 4.7
+</p>
+
+<p>
+    Your Rating: <span id="rating2">0</span>/5
+</p>
+
+<select id="ratingSelect2">
+    <option value="">Select Rating</option>
+    <option value="1">⭐ 1</option>
+    <option value="2">⭐⭐ 2</option>
+    <option value="3">⭐⭐⭐ 3</option>
+    <option value="4">⭐⭐⭐⭐ 4</option>
+    <option value="5">⭐⭐⭐⭐⭐ 5</option>
+</select>
+
+<button onclick="submitRating('Hotel Morya & Mess','rating2','ratingSelect2','thankYou2')">
+    ⭐ Submit Rating
+</button>
+
+<p id="thankYou2"></p>
+
+
+        <h4>Today's Special</h4>
+
+        <p>
+            Veg Kolhapuri<br>
+            Jeera Rice<br>
+            Chapati<br>
+            Sweet Dish
+        </p>
+
+        <button onclick="moryaMenu()">📋 Weekly Menu</button>
+
+        <br><br>
+
+        <a href="https://maps.app.goo.gl/BhQJk2ZmMRzEkMUR7" target="_blank" class="btn">
+            📍 Real Location
+        </a>
+
+        <a href="https://wa.me/919876543210" target="_blank" class="btn">
+            💬 WhatsApp
+        </a>
+
+    </div>
+
+    <!-- Vaishnavi Mess -->
+
+    <div class="college-card nonveg-card" id="vaishnaviMess">
+
+        <img src="vaishnavi.jpg" alt="Vaishnavi Mess">
+
+        <h3>Vaishnavi Lunch Mess</h3>
+        <span class="favorite" onclick="toggleFavorite(this)">
+❤️
+</span>
+
+        <span class="nonveg">🔴 Veg & Non-Veg</span>
+
+        <p>📍 Pune</p>
+        <p>₹3500 / Month</p>
+        
+
+<p>
+⭐ Original Rating: 4.6
+</p>
+
+<p>
+    Your Rating: <span id="rating3">0</span>/5
+</p>
+
+<select id="ratingSelect3">
+    <option value="">Select Rating</option>
+    <option value="1">⭐ 1</option>
+    <option value="2">⭐⭐ 2</option>
+    <option value="3">⭐⭐⭐ 3</option>
+    <option value="4">⭐⭐⭐⭐ 4</option>
+    <option value="5">⭐⭐⭐⭐⭐ 5</option>
+</select>
+
+<button onclick="submitRating('Vaishnavi Mess','rating3','ratingSelect3','thankYou3')">
+    ⭐ Submit Rating
+</button>
+
+<p id="thankYou3"></p>
+
+
+        <h4>Today's Special</h4>
+
+        <p>
+            Chicken Curry<br>
+            Rice<br>
+            Chapati<br>
+            Salad
+        </p>
+
+        <button onclick="vaishnaviMenu()">📋 Weekly Menu</button>
+
+        <br><br>
+
+        <a href="https://maps.app.goo.gl/U9JXjHAvBPNpMmaS8" target="_blank" class="btn">
+            📍 Real Location
+        </a>
+
+        <a href="https://wa.me/918888088216" target="_blank" class="btn">
+            💬 WhatsApp
+        </a>
+
+    </div>
+<div id="dynamicMesses"></div>
+</div>
+
+<!-- Dharmaraj Hotel card here -->
+
+<div class="college-card nonveg-card" id="dharmarajMess">
+
+<img src="dharmaraj.jpg" alt="Dharmaraj Hotel">
+
+<h3>Dharmaraj Hotel</h3>
+
+<span class="favorite" onclick="toggleFavorite(this)">❤️</span>
+
+<span class="nonveg">🔴 Veg & Non-Veg</span>
+
+<p>📍 Pune</p>
+<p>₹3000 / Month</p>
+
+<p>⭐ Original Rating: 4.4</p>
+
+<p>
+    Your Rating: <span id="rating4">0</span>/5
+</p>
+
+<select id="ratingSelect4">
+    <option value="">Select Rating</option>
+    <option value="1">⭐ 1</option>
+    <option value="2">⭐⭐ 2</option>
+    <option value="3">⭐⭐⭐ 3</option>
+    <option value="4">⭐⭐⭐⭐ 4</option>
+    <option value="5">⭐⭐⭐⭐⭐ 5</option>
+</select>
+
+<button onclick="submitRating('Dharmaraj Hotel','rating4','ratingSelect4','thankYou4')">
+    ⭐ Submit Rating
+</button>
+
+<p id="thankYou4"></p>
+<button onclick="dharmarajMenu()">
+📋 Menu
+</button>
+<h4>Today's Special</h4>
+
+<p>
+Egg Bhaji Unlimited<br>
+Bhurji Chapati<br>
+Dal Choice
+</p>
+<br><br>
+
+<a href="https://www.google.com/maps?q=18.647724,73.762825"
+target="_blank"
+class="btn">
+📍 Real Location
+</a>
+<a href="https://wa.me/917058307077"
+target="_blank"
+class="btn">
+💬 WhatsApp
+</a>
+</div>
+
+<!-- Vakratunda card here -->
+<div class="college-card veg-card" id="vakratundaMess">
+
+    <img src="vakratunda.jpg" alt="Vakratunda Mess">
+
+    <h3>Vakratunda</h3>
+
+    <span class="favorite" onclick="toggleFavorite(this)">
+    ❤️
+    </span>
+
+    <span class="veg">🟢 Veg</span>
+
+    <p>📍 Pune</p>
+    <p>₹3000 / Month</p>
+
+    <p>
+    ⭐ Original Rating: 4.5
+    </p>
+
+    <p>
+        Your Rating: <span id="rating5">0</span>/5
+    </p>
+
+    <select id="ratingSelect5">
+        <option value="">Select Rating</option>
+        <option value="1">⭐ 1</option>
+        <option value="2">⭐⭐ 2</option>
+        <option value="3">⭐⭐⭐ 3</option>
+        <option value="4">⭐⭐⭐⭐ 4</option>
+        <option value="5">⭐⭐⭐⭐⭐ 5</option>
+    </select>
+
+    <button onclick="submitRating('Vakratunda','rating5','ratingSelect5','thankYou5')">
+        ⭐ Submit Rating
+    </button>
+
+    <p id="thankYou5"></p>
+
+    <h4>Today's Special</h4>
+
+    <p>
+Paneer Masala<br>
+Jeera Rice<br>
+Chapati<br>
+Sweet Dish
+</p>
+
+    <button onclick="vakratundaMenu()">
+        📋 Weekly Menu
+    </button>
+
+    <br><br>
+
+    <a href="https://www.google.com/maps?q=18.645754,73.765171"
+target="_blank"
+class="btn">
+📍 Real Location
+</a>
+
+    <a href="https://wa.me/918482949266" target="_blank" class="btn">
+        💬 WhatsApp
+    </a>
+
+</div>
+
+<!-- Hotel Shivbhumi card here -->
+ <div class="college-card nonveg-card" id="shivbhumiMess">
+
+    <img src="shivbhumi.jpg" alt="Hotel Shivbhumi & Mess">
+
+    <h3>Hotel Shivbhumi & Mess</h3>
+
+    <span class="favorite" onclick="toggleFavorite(this)">
+    ❤️
+    </span>
+
+    <span class="nonveg">🔴 Veg & Non-Veg</span>
+
+    <p>📍 Akurdi, Pune</p>
+    <p>₹3500 / Month</p>
+    <p>🍽 Meals: ₹100 - ₹180</p>
+
+    <p>
+    ⭐ Original Rating: 4.5
+    </p>
+
+    <p>
+        Your Rating: <span id="rating6">0</span>/5
+    </p>
+
+    <select id="ratingSelect6">
+        <option value="">Select Rating</option>
+        <option value="1">⭐ 1</option>
+        <option value="2">⭐⭐ 2</option>
+        <option value="3">⭐⭐⭐ 3</option>
+        <option value="4">⭐⭐⭐⭐ 4</option>
+        <option value="5">⭐⭐⭐⭐⭐ 5</option>
+    </select>
+
+    <button onclick="submitRating('Hotel Shivbhumi & Mess','rating6','ratingSelect6','thankYou6')">
+        ⭐ Submit Rating
+    </button>
+
+    <p id="thankYou6"></p>
+
+    <h4>Today's Special</h4>
+
+    <p>
+        Chicken Masala<br>
+        Rice<br>
+        Chapati<br>
+        Salad
+    </p>
+
+    <button onclick="shivbhumiMenu()">
+        📋 Weekly Menu
+    </button>
+
+    <br><br>
+
+    <a href="https://www.google.com/maps?q=18.645769,73.765319"
+target="_blank"
+class="btn">
+📍 Real Location
+</a>
+
+    <a href="https://wa.me/919075658281" target="_blank" class="btn">
+        💬 WhatsApp
+    </a>
+
+</div>
+
+<!-- Payal Khanaval card here -->
+ <div class="college-card nonveg-card" id="payalMess">
+
+    <img src="payal.jpg" alt="Payal Khanaval">
+
+    <h3>Payal Khanaval</h3>
+
+    <span class="favorite" onclick="toggleFavorite(this)">
+    ❤️
+    </span>
+
+    <span class="nonveg">🔴 Veg & Non-Veg</span>
+    <p>📍 Pune</p>
+    <p>₹3000 / Month</p>
+    <p>🍽 Veg Meals: ₹80 - ₹150</p>
+
+    <p>
+    ⭐ Original Rating: 4.4
+    </p>
+
+    <p>
+        Your Rating: <span id="rating7">0</span>/5
+    </p>
+
+    <select id="ratingSelect7">
+        <option value="">Select Rating</option>
+        <option value="1">⭐ 1</option>
+        <option value="2">⭐⭐ 2</option>
+        <option value="3">⭐⭐⭐ 3</option>
+        <option value="4">⭐⭐⭐⭐ 4</option>
+        <option value="5">⭐⭐⭐⭐⭐ 5</option>
+    </select>
+
+    <button onclick="submitRating('Payal Khanaval','rating7','ratingSelect7','thankYou7')">
+        ⭐ Submit Rating
+    </button>
+
+    <p id="thankYou7"></p>
+
+    <h4>Today's Special</h4>
+
+    <p>
+Black Masala Chicken Thali<br>
+Chicken Rice Plate<br>
+Egg Curry<br>
+Bhakri
+</p>
+
+    <button onclick="payalMenu()">
+        📋 Weekly Menu
+    </button>
+
+    <br><br>
+
+    <a href="https://www.google.com/maps?q=18.647470,73.763882"
+target="_blank"
+class="btn">
+📍 Real Location
+</a>
+
+    <a href="https://wa.me/917385968262" target="_blank" class="btn">
+        💬 WhatsApp
+    </a>
+
+</div>
+
+<!-- Nagdev Hotel card here -->
+ <div class="college-card nonveg-card" id="nagdevMess">
+
+    <img src="nagdev.jpg" alt="Nagdev Hotel">
+
+    <h3>Nagdev Hotel</h3>
+
+    <span class="favorite" onclick="toggleFavorite(this)">
+    ❤️
+    </span>
+
+    <span class="nonveg">🔴 Veg & Non-Veg</span>
+
+    <p>📍 Pune</p>
+    <p>Meals ₹50 - ₹150</p>
+
+    <p>
+    ⭐ Original Rating: 4.5
+    </p>
+
+    <p>
+        Your Rating: <span id="rating8">0</span>/5
+    </p>
+
+    <select id="ratingSelect8">
+        <option value="">Select Rating</option>
+        <option value="1">⭐ 1</option>
+        <option value="2">⭐⭐ 2</option>
+        <option value="3">⭐⭐⭐ 3</option>
+        <option value="4">⭐⭐⭐⭐ 4</option>
+        <option value="5">⭐⭐⭐⭐⭐ 5</option>
+    </select>
+
+    <button onclick="submitRating('Nagdev Hotel','rating8','ratingSelect8','thankYou8')">
+        ⭐ Submit Rating
+    </button>
+
+    <p id="thankYou8"></p>
+
+    <h4>Today's Special</h4>
+
+    <p>
+Special Chicken Thali<br>
+Chicken Masala<br>
+Egg Bhurji<br>
+Jeera Rice
+</p>
+
+    <button onclick="nagdevMenu()">
+        📋 Weekly Menu
+    </button>
+
+    <br><br>
+
+    <a href="https://maps.app.goo.gl/Fwqv26jhG6bh8QZT7?g_st=aw"
+target="_blank"
+class="btn">
+📍 Real Location
+</a>
+
+    <a href="https://wa.me/919552978073" target="_blank" class="btn">
+        💬 WhatsApp
+    </a>
+
+</div>
+
+<!-- Aaswad Hotel & Family Restaurant card here -->
+ <div class="college-card nonveg-card" id="aaswadMess">
+
+    <img src="aaswad.jpg" alt="Aaswad Hotel & Family Restaurant">
+
+    <h3>Aaswad Hotel & Family Restaurant</h3>
+
+    <span class="favorite" onclick="toggleFavorite(this)">
+    ❤️
+    </span>
+
+    <span class="nonveg">🔴 Veg & Non-Veg</span>
+
+    <p>📍 Akurdi, Pune</p>
+    <p>Meals ₹40 - ₹170</p>
+
+    <p>
+    ⭐ Original Rating: 4.6
+    </p>
+
+    <p>
+        Your Rating: <span id="rating9">0</span>/5
+    </p>
+
+    <select id="ratingSelect9">
+        <option value="">Select Rating</option>
+        <option value="1">⭐ 1</option>
+        <option value="2">⭐⭐ 2</option>
+        <option value="3">⭐⭐⭐ 3</option>
+        <option value="4">⭐⭐⭐⭐ 4</option>
+        <option value="5">⭐⭐⭐⭐⭐ 5</option>
+    </select>
+
+    <button onclick="submitRating('Aaswad Hotel & Family Restaurant','rating9','ratingSelect9','thankYou9')">
+        ⭐ Submit Rating
+    </button>
+
+    <p id="thankYou9"></p>
+
+    <h4>Today's Special</h4>
+
+    <p>
+        Thecha Chicken Thali<br>
+        Paneer Thali<br>
+        Egg Bhurji<br>
+        Dal Rice
+    </p>
+
+    <button onclick="aaswadMenu()">
+        📋 Weekly Menu
+    </button>
+
+    <br><br>
+
+    <a href="https://www.google.com/maps?q=18.645920,73.763748"
+    target="_blank"
+    class="btn">
+    📍 Real Location
+    </a>
+
+    <a href="https://wa.me/919876543210"
+    target="_blank"
+    class="btn">
+    💬 WhatsApp
+    </a>
+
+</div>
+
+<!-- Aarambh Hotel card here -->
+ <div class="college-card nonveg-card" id="aarambhMess">
+
+    <img src="aarambh.jpg" alt="Hotel Aarambh">
+
+    <h3>Hotel Aarambh</h3>
+
+    <span class="favorite" onclick="toggleFavorite(this)">
+    ❤️
+    </span>
+
+    <span class="nonveg">🔴 Veg & Non-Veg</span>
+
+    <p>📍 Akurdi, Pune</p>
+    <p>Meals ₹10 - ₹120</p>
+
+    <p>
+    ⭐ Original Rating: 4.5
+    </p>
+
+    <p>
+        Your Rating: <span id="rating10">0</span>/5
+    </p>
+
+    <select id="ratingSelect10">
+        <option value="">Select Rating</option>
+        <option value="1">⭐ 1</option>
+        <option value="2">⭐⭐ 2</option>
+        <option value="3">⭐⭐⭐ 3</option>
+        <option value="4">⭐⭐⭐⭐ 4</option>
+        <option value="5">⭐⭐⭐⭐⭐ 5</option>
+    </select>
+
+    <button onclick="submitRating('Hotel Aarambh','rating10','ratingSelect10','thankYou10')">
+        ⭐ Submit Rating
+    </button>
+
+    <p id="thankYou10"></p>
+
+    <h4>Today's Special</h4>
+
+    <p>
+        Chicken Masala<br>
+        Paneer Butter Masala<br>
+        Egg Bhurji<br>
+        Dal Tadka
+    </p>
+
+    <button onclick="aarambhMenu()">
+        📋 Weekly Menu
+    </button>
+
+    <br><br>
+
+    <a href="https://www.google.com/maps?q=18.645924,73.763191"
+    target="_blank"
+    class="btn">
+    📍 Real Location
+    </a>
+
+    <a href="https://wa.me/917038547083"
+    target="_blank"
+    class="btn">
+    💬 WhatsApp
+    </a>
+
+</div>
+
+<!--  christy restaurant card here -->
+  <div class="college-card nonveg-card" id="christyMess">
+
+    <img src="christy.jpg" alt="Christy Restaurant">
+
+    <h3>Christy Restaurant</h3>
+
+    <span class="favorite" onclick="toggleFavorite(this)">
+    ❤️
+    </span>
+
+    <span class="nonveg">🔴 Veg & Non-Veg</span>
+
+    <p>📍 Akurdi, Pune</p>
+    <p>Meals ₹10 - ₹260</p>
+
+    <p>
+    ⭐ Original Rating: 4.5
+    </p>
+
+    <p>
+        Your Rating: <span id="rating11">0</span>/5
+    </p>
+
+    <select id="ratingSelect11">
+        <option value="">Select Rating</option>
+        <option value="1">⭐ 1</option>
+        <option value="2">⭐⭐ 2</option>
+        <option value="3">⭐⭐⭐ 3</option>
+        <option value="4">⭐⭐⭐⭐ 4</option>
+        <option value="5">⭐⭐⭐⭐⭐ 5</option>
+    </select>
+
+    <button onclick="submitRating('Christy Restaurant','rating11','ratingSelect11','thankYou11')">
+        ⭐ Submit Rating
+    </button>
+
+    <p id="thankYou11"></p>
+
+    <h4>Today's Special</h4>
+
+    <p>
+        Chicken Thali<br>
+        Chicken Biryani<br>
+        Veg Maratha Thali<br>
+        Paneer Chilli Dry
+    </p>
+
+    <button onclick="christyMenu()">
+        📋 Weekly Menu
+    </button>
+
+    <br><br>
+
+    <a href="https://www.google.com/maps?q=18.648169,73.762285"
+    target="_blank"
+    class="btn">
+    📍 Real Location
+    </a>
+
+    <a href="https://wa.me/917083079674"
+    target="_blank"
+    class="btn">
+    💬 WhatsApp
+    </a>
+
+</div>
+
+<!-- Maitri Katta  card here -->
+ <div class="college-card veg-card" id="maitriMess">
+
+    <img src="maitri.jpg" alt="Maitri Katta">
+
+    <h3>Maitri Katta</h3>
+
+    <span class="favorite" onclick="toggleFavorite(this)">
+    ❤️
+    </span>
+
+    <span class="veg">🟢 Pure Veg</span>
+
+    <p>📍 Akurdi, Pune</p>
+    <p>Breakfast ₹30 - ₹120</p>
+
+    <p>
+    ⭐ Original Rating: 4.5
+    </p>
+
+    <p>
+        Your Rating: <span id="rating12">0</span>/5
+    </p>
+
+    <select id="ratingSelect12">
+        <option value="">Select Rating</option>
+        <option value="1">⭐ 1</option>
+        <option value="2">⭐⭐ 2</option>
+        <option value="3">⭐⭐⭐ 3</option>
+        <option value="4">⭐⭐⭐⭐ 4</option>
+        <option value="5">⭐⭐⭐⭐⭐ 5</option>
+    </select>
+
+    <button onclick="submitRating('Maitri Katta','rating12','ratingSelect12','thankYou12')">
+        ⭐ Submit Rating
+    </button>
+
+    <p id="thankYou12"></p>
+
+    <h4>Today's Special</h4>
+
+    <p>
+        Idli Sambar<br>
+        Medu Vada<br>
+        Masala Dosa<br>
+        Puri Bhaji
+    </p>
+
+    <button onclick="maitriMenu()">
+        📋 Menu
+    </button>
+
+    <br><br>
+
+    <a href="https://www.google.com/maps?q=18.648181,73.762388"
+    target="_blank"
+    class="btn">
+    📍 Real Location
+    </a>
+
+    <a href="https://wa.me/919545052492"
+    target="_blank"
+    class="btn">
+    💬 WhatsApp
+    </a>
+
+</div>
+
+<!--  Swagat Gharghuti Mess card here -->
+  <div class="college-card nonveg-card" id="swagatMess">
+
+    <img src="swagat.jpg" alt="Swagat Gharghuti Mess">
+
+    <h3>Swagat Gharghuti Mess</h3>
+
+    <span class="favorite" onclick="toggleFavorite(this)">
+    ❤️
+    </span>
+
+    <span class="nonveg">🔴 Veg & Non-Veg</span>
+
+    <p>📍 Akurdi, Pune</p>
+    <p>Meals ₹10 - ₹130</p>
+
+    <p>⭐ Original Rating: 4.5</p>
+
+    <p>
+        Your Rating: <span id="rating13">0</span>/5
+    </p>
+
+    <select id="ratingSelect13">
+        <option value="">Select Rating</option>
+        <option value="1">⭐ 1</option>
+        <option value="2">⭐⭐ 2</option>
+        <option value="3">⭐⭐⭐ 3</option>
+        <option value="4">⭐⭐⭐⭐ 4</option>
+        <option value="5">⭐⭐⭐⭐⭐ 5</option>
+    </select>
+
+    <button onclick="submitRating('Swagat Gharghuti Mess','rating13','ratingSelect13','thankYou13')">
+        ⭐ Submit Rating
+    </button>
+
+    <p id="thankYou13"></p>
+
+    <h4>Today's Special</h4>
+
+    <p>
+        Egg Thali<br>
+        Prawns Thali<br>
+        Bhurji Chapati<br>
+        Egg Rice
+    </p>
+
+    <button onclick="swagatMenu()">
+        📋 Menu
+    </button>
+
+    <br><br>
+
+    <a href="https://www.google.com/maps?q=18.645950,73.762861"
+    target="_blank"
+    class="btn">
+    📍 Real Location
+    </a>
+
+    <a href="https://wa.me/919823813596"
+    target="_blank"
+    class="btn">
+    💬 WhatsApp
+    </a>
+
+</div>
+
+<!--  Shree Swami Samarth card here -->
+  <div class="college-card veg-card" id="swamiMess">
+
+    <img src="swami.jpg" alt="Shree Swami Samarth">
+
+    <h3>Shree Swami Samarth</h3>
+
+    <span class="favorite" onclick="toggleFavorite(this)">
+    ❤️
+    </span>
+
+    <span class="veg">🟢 Pure Veg</span>
+
+    <p>📍 Akurdi, Pune</p>
+    <p>Meals ₹40 - ₹140</p>
+
+    <p>⭐ Original Rating: 4.4</p>
+
+    <p>
+        Your Rating: <span id="rating14">0</span>/5
+    </p>
+
+    <select id="ratingSelect14">
+        <option value="">Select Rating</option>
+        <option value="1">⭐ 1</option>
+        <option value="2">⭐⭐ 2</option>
+        <option value="3">⭐⭐⭐ 3</option>
+        <option value="4">⭐⭐⭐⭐ 4</option>
+        <option value="5">⭐⭐⭐⭐⭐ 5</option>
+    </select>
+
+    <button onclick="submitRating('Shree Swami Samarth','rating14','ratingSelect14','thankYou14')">
+        ⭐ Submit Rating
+    </button>
+
+    <p id="thankYou14"></p>
+
+    <h4>Today's Special</h4>
+
+    <p>
+        Pithla Bhakri<br>
+        Shev Bhaji<br>
+        Dal Rice<br>
+        Special Veg Thali
+    </p>
+
+    <button onclick="swamiMenu()">
+        📋 Menu
+    </button>
+
+    <br><br>
+
+    <a href="https://www.google.com/maps?q=18.645819,73.764572"
+    target="_blank"
+    class="btn">
+    📍 Real Location
+    </a>
+
+    <a href="https://wa.me/919876543210"
+    target="_blank"
+    class="btn">
+    💬 WhatsApp
+    </a>
+
+</div>
+
+<!--  Sugam Dining Hall card here -->
+  <div class="college-card veg-card" id="sugamMess">
+
+    <img src="sugam.jpg" alt="Sugam Dining Hall">
+
+    <h3>Sugam Dining Hall</h3>
+
+    <span class="favorite" onclick="toggleFavorite(this)">
+    ❤️
+    </span>
+
+    <span class="veg">🟢 Pure Veg</span>
+
+    <p>📍 Akurdi, Pune</p>
+    <p>Meals ₹50 - ₹150</p>
+
+    <p>⭐ Original Rating: 4.4</p>
+
+    <p>
+        Your Rating: <span id="rating15">0</span>/5
+    </p>
+
+    <select id="ratingSelect15">
+        <option value="">Select Rating</option>
+        <option value="1">⭐ 1</option>
+        <option value="2">⭐⭐ 2</option>
+        <option value="3">⭐⭐⭐ 3</option>
+        <option value="4">⭐⭐⭐⭐ 4</option>
+        <option value="5">⭐⭐⭐⭐⭐ 5</option>
+    </select>
+
+    <button onclick="submitRating('Sugam Dining Hall','rating15','ratingSelect15','thankYou15')">
+        ⭐ Submit Rating
+    </button>
+
+    <p id="thankYou15"></p>
+
+    <h4>Today's Special</h4>
+
+    <p>
+        Veg Thali<br>
+        Paneer Masala<br>
+        Dal Rice<br>
+        Chapati
+    </p>
+
+    <button onclick="sugamMenu()">
+        📋 Menu
+    </button>
+
+    <br><br>
+
+    <a href="https://www.google.com/maps?q=18.648463,73.762880"
+    target="_blank"
+    class="btn">
+    📍 Real Location
+    </a>
+
+    <a href="https://wa.me/919876543210"
+    target="_blank"
+    class="btn">
+    💬 WhatsApp
+    </a>
+
+</div>
+
+<!--  Jai Malhar Hotel & Mess card here -->
+  <div class="college-card nonveg-card" id="jaimalharMess">
+
+    <img src="jaimalhar.jpg" alt="Jai Malhar Hotel & Mess">
+
+    <h3>Jai Malhar Hotel & Mess</h3>
+
+    <span class="favorite" onclick="toggleFavorite(this)">
+    ❤️
+    </span>
+
+    <span class="nonveg">🔴 Veg & Non-Veg</span>
+
+    <p>📍 Akurdi, Pune</p>
+    <p>Meals ₹50 - ₹180</p>
+
+    <p>⭐ Original Rating: 4.5</p>
+
+    <p>
+        Your Rating: <span id="rating16">0</span>/5
+    </p>
+
+    <select id="ratingSelect16">
+        <option value="">Select Rating</option>
+        <option value="1">⭐ 1</option>
+        <option value="2">⭐⭐ 2</option>
+        <option value="3">⭐⭐⭐ 3</option>
+        <option value="4">⭐⭐⭐⭐ 4</option>
+        <option value="5">⭐⭐⭐⭐⭐ 5</option>
+    </select>
+
+    <button onclick="submitRating('Jai Malhar Hotel & Mess','rating16','ratingSelect16','thankYou16')">
+        ⭐ Submit Rating
+    </button>
+
+    <p id="thankYou16"></p>
+
+    <h4>Today's Special</h4>
+
+    <p>
+        Chicken Thali<br>
+        Egg Curry<br>
+        Veg Thali<br>
+        Bhakri
+    </p>
+
+    <button onclick="jaiMalharMenu()">
+        📋 Menu
+    </button>
+
+    <br><br>
+
+    <a href="https://www.google.com/maps?q=18.647470,73.763882"
+    target="_blank"
+    class="btn">
+    📍 Real Location
+    </a>
+
+    <a href="https://wa.me/919860886092"
+    target="_blank"
+    class="btn">
+    💬 WhatsApp
+    </a>
+
+</div>
+</section>
+
+<footer>
+    <p>© 2026 PCCOE/DYP Mess Finder</p>
+</footer>
+
+<script type="module">
+    import {
+  db,
+  ref,
+  get
+} from "./db.js";
+
+function patilMenu(){
+
+alert(
+
+"PATIL MESS MENU\n\n"+
+
+"Monday - Dal Rice ₹60\n"+
+"Tuesday - Paneer Masala ₹120\n"+
+"Wednesday - Mix Veg ₹90\n"+
+"Thursday - Chole Bhature ₹100\n"+
+"Friday - Veg Pulao ₹80\n"+
+"Saturday - Pav Bhaji ₹90\n"+
+"Sunday - Special Veg Thali ₹140"
+
+);
+
+}
+
+function moryaMenu(){
+
+alert(
+
+"MORYA MESS MENU\n\n"+
+
+"Monday - Aloo Sabji ₹70\n"+
+"Tuesday - Paneer Butter Masala ₹130\n"+
+"Wednesday - Veg Kolhapuri ₹100\n"+
+"Thursday - Puri Bhaji ₹90\n"+
+"Friday - Jeera Rice ₹70\n"+
+"Saturday - Misal Pav ₹80\n"+
+"Sunday - Special Maharashtrian Thali ₹150"
+
+);
+
+}
+
+function vaishnaviMenu(){
+
+alert(
+
+"VAISHNAVI MESS MENU\n\n"+
+
+"Monday - Chicken Curry ₹130\n"+
+"Tuesday - Egg Curry ₹100\n"+
+"Wednesday - Chicken Biryani ₹150\n"+
+"Thursday - Fish Curry ₹140\n"+
+"Friday - Chicken Masala ₹140\n"+
+"Saturday - Egg Biryani ₹120\n"+
+"Sunday - Special Chicken Thali ₹180"
+
+);
+
+}
+function dharmarajMenu(){
+
+alert(
+"DHARMARAJ HOTEL MENU\n\n"+
+
+"Chayani Bhaji - ₹50\n"+
+"Chindal Bhaji Unlimited - ₹450\n"+
+"Egg Bhaji Unlimited - ₹120\n"+
+"Bhurji Chapati - ₹80\n"+
+"Choice Bhurji - ₹50\n"+
+"Omelet Chapati - ₹80\n"+
+"Dal Choice - ₹50\n"+
+"Extra Bhaji - ₹30\n"+
+"Extra Rice - ₹30\n"+
+"Extra Chapati (1 Piece) - ₹50\n"+
+"Dal Bowl Unlimited (Murgyar) - ₹100\n"+
+"Bread - ₹20\n"+
+"Sorghum Millets - ₹20"
+);
+
+}
+function vakratundaMenu(){
+
+alert(
+"VAKRATUNDA MENU\n\n"+
+
+"Monday\n"+
+"Dal Fry + Rice + Chapati - ₹80\n\n"+
+
+"Tuesday\n"+
+"Paneer Masala + Jeera Rice - ₹120\n\n"+
+
+"Wednesday\n"+
+"Mix Veg + Chapati - ₹90\n\n"+
+
+"Thursday\n"+
+"Chole Masala + Rice - ₹90\n\n"+
+
+"Friday\n"+
+"Veg Kolhapuri + Chapati - ₹100\n\n"+
+
+"Saturday\n"+
+"Veg Pulao + Sweet Dish - ₹110\n\n"+
+
+"Sunday\n"+
+"Special Veg Thali - ₹150"
+);
+
+}
+function shivbhumiMenu(){
+
+alert(
+"HOTEL SHIVBHUMI MENU\n\n"+
+
+"Monday - Chicken Curry + Rice - ₹150\n"+
+"Tuesday - Egg Curry + Chapati - ₹120\n"+
+"Wednesday - Chicken Masala + Rice - ₹160\n"+
+"Thursday - Veg Thali - ₹100\n"+
+"Friday - Chicken Biryani - ₹180\n"+
+"Saturday - Egg Biryani - ₹140\n"+
+"Sunday - Special Chicken Thali - ₹200"
+);
+
+}
+function payalMenu(){
+
+alert(
+"PAYAL KHANAVAL MENU\n\n"+
+
+"Rice Plate Unlimited - ₹90\n"+
+"Bhaji Chapati (4) - ₹70\n"+
+"Dal Rice - ₹60\n"+
+"Paneer Bhurji + Rice - ₹100\n"+
+"Egg Bhurji (4 Chapati) - ₹90\n"+
+"Omelette Chapati - ₹80\n"+
+"Boil Bhurji - ₹100\n"+
+"Egg Curry Unlimited - ₹100\n"+
+"Black Masala Chicken Thali - ₹150\n"+
+"Chicken Bhakri Thali Unlimited - ₹160\n"+
+"Chicken Rice Plate Unlimited - ₹130\n"+
+"Kadi Khichdi Unlimited - ₹80\n"+
+"Bharit Bhakri (2 Bhakri) - ₹110\n"+
+"Bhakri Rice Plate Unlimited - ₹110\n"+
+"Chapati - ₹10\n"+
+"Jowar/Bajra Bhakri - ₹25"
+);
+
+}
+function nagdevMenu(){
+
+alert(
+"NAGDEV HOTEL MENU\n\n"+
+
+"Rice Plate - ₹80\n"+
+"Chapati Bhaji - ₹60\n"+
+"Varan Rice - ₹50\n"+
+"Dal Khichdi - ₹70\n"+
+"Paneer Masala - ₹80\n"+
+"Special Shev Bhaji - ₹80\n"+
+"Dal Tadka - ₹80\n"+
+"Jeera Rice - ₹50\n"+
+"Bhakri - ₹30\n\n"+
+
+"NON-VEG\n"+
+"Special Chicken Thali - ₹150\n"+
+"Chicken Thali - ₹150\n"+
+"Chicken Masala - ₹120\n"+
+"Egg Plate - ₹100\n"+
+"Egg Masala - ₹100\n"+
+"Egg Bhurji - ₹80\n"+
+"Omelette Chapati - ₹70\n"+
+"Boil Bhurji - ₹70\n"+
+"Egg Rice - ₹80\n"+
+"Boil Plate - ₹80"
+);
+
+}
+function aaswadMenu(){
+
+alert(
+"AASWAD HOTEL MENU\n\n"+
+
+"Paneer Masala Thali - ₹110\n"+
+"Paneer Bhurji Gravy - ₹100\n"+
+"Paneer Bhurji Sukhi - ₹110\n"+
+"Paneer Thali - ₹120\n"+
+"Kaju Paneer Thali - ₹140\n"+
+"Shev Bhaji Curry - ₹110\n"+
+"Shev Bhaji Sukhi - ₹120\n"+
+"Mushroom Masala - ₹120\n"+
+"Dal Khichdi - ₹70-80\n"+
+"Dal Rice - ₹70\n\n"+
+
+"NON-VEG\n"+
+"Chicken Plate - ₹140\n"+
+"Chicken Curry Plate - ₹130\n"+
+"Special Chicken Plate - ₹130\n"+
+"Laut Chicken Thali - ₹150\n"+
+"Thecha Chicken Thali - ₹170\n"+
+"Egg Fry - ₹80-90\n"+
+"Egg Kheema - ₹110\n"+
+"Egg Bhaji - ₹120\n"+
+"Egg Masala - ₹130\n"+
+"Egg Rice - ₹80-90\n"+
+"Omelette - ₹60\n"+
+"Boil Fry - ₹48\n"+
+"Half Fry - ₹40"
+);
+
+}
+function aarambhMenu(){
+
+alert(
+"HOTEL AARAMBH MENU\n\n"+
+
+"VEG\n"+
+"Paneer Masala - ₹100\n"+
+"Matar Paneer - ₹110\n"+
+"Paneer Butter Masala - ₹110\n"+
+"Paneer Tikka Masala - ₹120\n"+
+"Kaju Masala - ₹100\n"+
+"Kaju Paneer Masala - ₹110\n"+
+"Shev Bhaji - ₹100\n"+
+"Dal Tadka - ₹100\n"+
+"Veg Kolhapuri - ₹70-100\n"+
+"Green Peas Masala - ₹70-100\n"+
+"Paneer Kolhapuri - ₹70-100\n"+
+"Masala Rice - ₹70-100\n"+
+"Dal Khichdi - ₹70-100\n"+
+"Dal Khichdi Tadka - ₹80-110\n"+
+"Jeera Rice - ₹30-50\n\n"+
+
+"NON-VEG\n"+
+"Egg Bhurji + 2 Chapati - ₹80\n"+
+"Egg Omelette + 2 Chapati - ₹80\n"+
+"Boiled Bhurji + 2 Chapati - ₹80\n"+
+"Egg Masala + 2 Chapati - ₹100\n"+
+"Chicken Curry + 2 Chapati - ₹110\n"+
+"Chicken Masala + 2 Chapati - ₹120\n"+
+"Chicken Rice - ₹90-120\n"+
+"Egg Rice - ₹80-110\n\n"+
+
+"Chapati - ₹10"
+);
+
+}
+function christyMenu(){
+
+alert(
+"CHRISTY RESTAURANT MENU\n\n"+
+
+"Veg Thali - ₹100\n"+
+"Veg Kolhapuri Thali - ₹120\n"+
+"Veg Maratha Thali - ₹120\n"+
+"Mixed Veg Thali - ₹120\n"+
+"Dal Tadka Thali - ₹120\n"+
+"Chapati Bhaji - ₹70\n"+
+"Chapati - ₹10\n"+
+"Bread - ₹20\n"+
+"Veg Biryani - ₹130-170\n"+
+"Paneer Biryani - ₹130-170\n"+
+"Dal Khichdi - ₹130-170\n"+
+"Tawa Pulao - ₹130-170\n"+
+"Veg Manchurian Dry - ₹260\n"+
+"Paneer Chilli Dry - ₹180\n"+
+"Masala Rice - ₹130\n\n"+
+
+"NON-VEG\n"+
+"Chicken Thali - ₹150\n"+
+"Egg Plate - ₹130\n"+
+"Chicken Biryani - ₹140-180\n"+
+"Egg Biryani - ₹170\n"+
+"Chicken Fried Rice - ₹140-180\n"+
+"Chicken Triple Rice - ₹140-180\n"+
+"Chicken Masala - ₹150-200\n"+
+"Chicken Hakka Noodles - ₹150\n"+
+"Chicken Chilli Dry - ₹180"
+);
+
+}
+function maitriMenu(){
+
+alert(
+"MAITRI KATTA MENU\n\n"+
+
+"Idli Chutney - ₹40\n"+
+"Vada Sambar - ₹50\n"+
+"Pohe - ₹30\n"+
+"Plain Dosa - ₹60\n"+
+"Masala Dosa - ₹80\n"+
+"Uttappa - ₹90\n"+
+"Puri Bhaji - ₹70\n"+
+"Tea - ₹15\n"+
+"Coffee - ₹20"
+);
+
+}
+function swagatMenu(){
+
+alert(
+"SWAGAT GHARGHUTI MESS MENU\n\n"+
+
+"Veg Thali - ₹80\n"+
+"Chapati Bhaji - ₹70\n"+
+"Alani Rice - ₹100\n"+
+"Chapati - ₹10\n"+
+"Jowar Bhakri - ₹25\n\n"+
+
+"NON-VEG\n"+
+"Prawn Thali (Bhakri/Chapati) - ₹130\n"+
+"Egg Thali (Bhakri/Chapati) - ₹100\n"+
+"Omelette Chapati - ₹70\n"+
+"Bhurji Chapati - ₹70\n"+
+"Egg Rice (Half Fry) - ₹90"
+);
+
+}
+function swamiMenu(){
+
+alert(
+"SHREE SWAMI SAMARTH MENU\n\n"+
+
+"Veg Thali - ₹100\n"+
+"Special Veg Thali - ₹140\n"+
+"Pithla Bhakri - ₹80\n"+
+"Shev Bhaji - ₹90\n"+
+"Paneer Masala - ₹120\n"+
+"Dal Rice - ₹60\n"+
+"Jeera Rice - ₹70\n"+
+"Masala Rice - ₹80\n"+
+"Chapati - ₹10\n"+
+"Jowar Bhakri - ₹25"
+);
+
+}
+function sugamMenu(){
+
+alert(
+"SUGAM DINING HALL MENU\n\n"+
+"Veg Thali - ₹100\n"+
+"Special Veg Thali - ₹150\n"+
+"Paneer Masala - ₹120\n"+
+"Mix Veg - ₹100\n"+
+"Dal Tadka - ₹90\n"+
+"Jeera Rice - ₹80\n"+
+"Masala Rice - ₹90\n"+
+"Chapati - ₹10\n"+
+"Bhakri - ₹25"
+);
+
+}
+function jaiMalharMenu(){
+
+alert(
+"JAI MALHAR HOTEL & MESS MENU\n\n"+
+
+"Veg Thali - ₹100\n"+
+"Special Veg Thali - ₹140\n"+
+"Paneer Masala - ₹120\n"+
+"Shev Bhaji - ₹90\n"+
+"Dal Rice - ₹60\n"+
+"Jeera Rice - ₹80\n\n"+
+
+"NON-VEG\n"+
+"Chicken Thali - ₹150\n"+
+"Chicken Masala - ₹140\n"+
+"Egg Curry - ₹100\n"+
+"Egg Bhurji - ₹90\n"+
+"Egg Rice - ₹90\n"+
+"Chapati - ₹10\n"+
+"Bhakri - ₹25"
+);
+
+}
+function searchMess(){
+
+    let input =
+    document.getElementById("searchInput")
+    .value.toLowerCase();
+
+    let cards =
+    document.querySelectorAll(".college-card");
+
+    cards.forEach(card=>{
+
+        let text =
+        card.innerText.toLowerCase();
+
+        if(text.includes(input)){
+            card.style.display="block";
+        }
+        else{
+            card.style.display="none";
+        }
+
+    });
+
+}
+
+function filterMess(type){
+
+    let vegCards = document.querySelectorAll(".veg-card");
+    let nonvegCards = document.querySelectorAll(".nonveg-card");
+
+    if(type==="all"){
+        document.querySelectorAll(".college-card").forEach(card=>{
+            card.style.display="block";
+        });
+    }
+
+    if(type==="veg"){
+        vegCards.forEach(card=>card.style.display="block");
+        nonvegCards.forEach(card=>card.style.display="none");
+    }
+
+    if(type==="nonveg"){
+        vegCards.forEach(card=>card.style.display="none");
+        nonvegCards.forEach(card=>card.style.display="block");
+    }
+}
+function toggleFavorite(element){
+
+    let card = element.parentElement;
+
+    let messName =
+    card.querySelector("h3").innerText.trim();
+
+    let favorites =
+    JSON.parse(localStorage.getItem("favorites")) || [];
+
+    let index =
+    favorites.indexOf(messName);
+
+    if(index === -1){
+
+        favorites.push(messName);
+
+        element.innerHTML = "💖";
+
+    }else{
+
+        favorites.splice(index,1);
+
+        element.innerHTML = "❤️";
+    }
+
+    localStorage.setItem(
+        "favorites",
+        JSON.stringify(favorites)
+    );
+}
+
+function findLocation() {
+
+    if (navigator.geolocation) {
+
+        navigator.geolocation.getCurrentPosition(function(position) {
+
+            let lat = position.coords.latitude;
+            let lng = position.coords.longitude;
+
+            window.open(
+                "https://www.google.com/maps/search/mess/@"
+                + lat + "," + lng + ",15z",
+                "_blank"
+            );
+
+        }, showError);
+
+    } else {
+
+        alert("Geolocation not supported");
+
+    }
+
+}
+
+
+function showPosition(position){
+
+    document.getElementById(
+        "locationResult"
+    ).innerHTML =
+    "✅ Location Detected Successfully";
+
+    window.open(
+        "https://www.google.com/maps/search/mess+near+me",
+        "_blank"
+    );
+
+}
+
+function showError(){
+
+    document.getElementById(
+        "locationResult"
+    ).innerHTML =
+    "Location access denied.";
+
+}
+function loadOwnerMesses(){
+
+
+
+}
+function submitRating(messName, ratingId, selectId, thankYouId){
+
+    let rating =
+    document.getElementById(selectId).value;
+
+    if(rating === ""){
+        alert("Please select a rating first.");
+        return;
+    }
+
+    // Save the rating
+    localStorage.setItem(
+        "rating_" + messName,
+        rating
+    );
+
+    // Show selected rating
+    document.getElementById(ratingId).innerText =
+    rating;
+
+    // Show thank-you message
+    document.getElementById(thankYouId).innerText =
+    "✅ Thank you for your response!";
+
+    // Clear the dropdown
+    document.getElementById(selectId).value = "";
+}
+
+// Re-apply saved favourites (hearts) and the user's saved ratings after a reload
+function restoreSavedState(){
+
+    try{
+
+        let favorites =
+        JSON.parse(localStorage.getItem("favorites")) || [];
+
+        document.querySelectorAll(".favorite").forEach(el => {
+
+            let title = el.parentElement.querySelector("h3");
+
+            if(title && favorites.includes(title.innerText.trim())){
+                el.innerHTML = "💖";
+            }
+
+        });
+
+    }catch(error){
+        console.error("Could not restore favorites:", error);
+    }
+
+    document.querySelectorAll('button[onclick^="submitRating"]').forEach(btn => {
+
+        let m = btn.getAttribute("onclick")
+        .match(/submitRating\('([^']*)','([^']*)'/);
+
+        if(!m) return;
+
+        let saved = localStorage.getItem("rating_" + m[1]);
+        let span = document.getElementById(m[2]);
+
+        if(saved && span){
+            span.innerText = saved;
+        }
+
+    });
+}
+
+window.addEventListener("load", function(){
+
+loadDatabaseMesses();
+    restoreSavedState();
+    let hash = window.location.hash;
+
+    if(hash){
+
+        let card = null;
+
+        try{
+            card = document.querySelector(hash);
+        }catch(error){
+            card = null;
+        }
+
+        if(card){
+
+            card.classList.add("highlight");
+
+            card.scrollIntoView({
+                behavior:"smooth",
+                block:"center"
+            });
+
+        }
+
+    }
+
+});
+// Escapes text before it is placed in the page
+function esc(value){
+    return String(value === undefined || value === null ? "" : value)
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#39;");
+}
+
+// Ratings for messes stored in the database are saved on the server
+document.addEventListener("click", async function(e){
+
+    let btn = e.target.closest(".dyn-rate-btn");
+    if(!btn) return;
+
+    let card = btn.closest(".college-card");
+    let rating = card.querySelector(".dyn-rate").value;
+    let thanks = card.querySelector(".dyn-thanks");
+
+    if(rating === ""){
+        alert("Please select a rating first.");
+        return;
+    }
+
+    btn.disabled = true;
+
+    try{
+        const res = await fetch(
+            "/api/messes/" + encodeURIComponent(btn.dataset.key) + "/reviews",
+            {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ rating: Number(rating) })
+            }
+        );
+        const out = await res.json().catch(() => ({}));
+        if(!res.ok) throw new Error(out.error || "Could not save rating");
+        thanks.innerText = "✅ Thank you for your response!";
+        card.querySelector(".dyn-rate").value = "";
+    }catch(err){
+        thanks.innerText = "❌ " + err.message;
+    }
+
+    btn.disabled = false;
+});
+
+async function loadDatabaseMesses(){
+
+let container =
+document.getElementById("dynamicMesses");
+
+if(!container) return;
+
+try{
+
+const snapshot =
+await get(ref(db,"messes"));
+
+if(!snapshot.exists()) return;
+
+const data = snapshot.val();
+
+let html = "";
+
+Object.entries(data).filter(([k,v])=>v).forEach(([key,mess])=>{
+
+let reviews = Array.isArray(mess.reviews)
+? mess.reviews
+: Object.values(mess.reviews || {});
+
+let ratingText = reviews.length
+? "⭐ " + (reviews.reduce((sum,r)=>sum+Number(r.rating||0),0) / reviews.length).toFixed(1)
+  + " / 5 (" + reviews.length + (reviews.length === 1 ? " rating)" : " ratings)")
+: "⭐ No ratings yet";
+
+// so the Veg / Non-Veg filter buttons also work on these cards
+let t = (mess.type || "").toLowerCase();
+let typeClass =
+t.includes("non") ? " nonveg-card" :
+(t.includes("veg") ? " veg-card" : "");
+
+html += `
+
+<div class="college-card${typeClass}">
+
+<img src="${esc(
+mess.photo ||
+'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=600'
+)}" alt="Mess">
+
+<h3>${esc(mess.name)}</h3>
+
+<p>📍 ${esc(mess.location)}</p>
+
+<p>💰 ${esc(mess.price)}</p>
+
+<p>🍽 ${esc(mess.type)}</p>
+
+<p>📞 ${esc(mess.contactNumber || "Not Available")}</p>
+
+<p>🕒 ${esc(mess.openTime || "")} - ${esc(mess.closeTime || "")}</p>
+
+<p>${esc(ratingText)}</p>
+
+<select class="dyn-rate">
+<option value="">Select Rating</option>
+<option value="1">⭐ 1</option>
+<option value="2">⭐⭐ 2</option>
+<option value="3">⭐⭐⭐ 3</option>
+<option value="4">⭐⭐⭐⭐ 4</option>
+<option value="5">⭐⭐⭐⭐⭐ 5</option>
+</select>
+
+<button class="dyn-rate-btn" data-key="${esc(key)}">⭐ Submit Rating</button>
+
+<p class="dyn-thanks"></p>
+
+<p style="white-space:pre-line;">${esc(mess.menu || "")}</p>
+
+<a href="${esc(mess.mapLink || '#')}"
+class="btn"
+target="_blank">
+📍 Location
+</a>
+
+<a href="${esc(mess.whatsappLink || '#')}"
+class="btn"
+target="_blank">
+💬 WhatsApp
+</a>
+
+</div>
+
+`;
+
+});
+
+container.innerHTML = html;
+
+}catch(error){
+
+console.error("Could not load messes:", error);
+
+}
+
+}
+
+// This script is a module, so functions used by onclick="..." in the HTML
+// must be attached to window (they were not, so those buttons did nothing)
+Object.assign(window, {
+    patilMenu, moryaMenu, vaishnaviMenu, dharmarajMenu, vakratundaMenu,
+    shivbhumiMenu, payalMenu, nagdevMenu, aaswadMenu, aarambhMenu,
+    christyMenu, maitriMenu, swagatMenu, swamiMenu, sugamMenu, jaiMalharMenu,
+    searchMess, filterMess, toggleFavorite, findLocation, submitRating
+});
+</script>
+
+</body>
+</html>
