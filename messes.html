@@ -5,6 +5,25 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PCCOE/DYP Mess Finder</title>
 <link rel="stylesheet" href="style.css">
+<style>
+.fav-btn{
+    display:block;
+    margin:10px auto;
+    padding:10px 18px;
+    border:none;
+    border-radius:25px;
+    background:#38bdf8;
+    color:white;
+    cursor:pointer;
+    font-size:15px;
+}
+.fav-btn:hover{
+    background:#0ea5e9;
+}
+.fav-btn.added{
+    background:#ec4899;
+}
+</style>
 </head>
 
 <body>
@@ -48,9 +67,7 @@
         <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=600" alt="Food">
 
         <h3>Patil Mess</h3>
-        <span class="favorite" onclick="toggleFavorite(this)">
-❤️
-</span>
+        <button class="fav-btn" onclick="toggleFavorite(this)">🤍 Add to Favorite</button>
 
         <span class="veg">🟢 Veg</span>
 
@@ -107,9 +124,7 @@
 
         <img src="morya.jpg" alt="Hotel Morya & Mess">
         <h3>Hotel Morya & Mess</h3>
-        <span class="favorite" onclick="toggleFavorite(this)">
-❤️
-</span>
+        <button class="fav-btn" onclick="toggleFavorite(this)">🤍 Add to Favorite</button>
 
         <span class="veg">🟢 Pure Veg</span>
 
@@ -171,9 +186,7 @@
         <img src="vaishnavi.jpg" alt="Vaishnavi Mess">
 
         <h3>Vaishnavi Lunch Mess</h3>
-        <span class="favorite" onclick="toggleFavorite(this)">
-❤️
-</span>
+        <button class="fav-btn" onclick="toggleFavorite(this)">🤍 Add to Favorite</button>
 
         <span class="nonveg">🔴 Veg & Non-Veg</span>
 
@@ -238,7 +251,7 @@
 
 <h3>Dharmaraj Hotel</h3>
 
-<span class="favorite" onclick="toggleFavorite(this)">❤️</span>
+<button class="fav-btn" onclick="toggleFavorite(this)">🤍 Add to Favorite</button>
 
 <span class="nonveg">🔴 Veg & Non-Veg</span>
 
@@ -296,9 +309,7 @@ class="btn">
 
     <h3>Vakratunda</h3>
 
-    <span class="favorite" onclick="toggleFavorite(this)">
-    ❤️
-    </span>
+    <button class="fav-btn" onclick="toggleFavorite(this)">🤍 Add to Favorite</button>
 
     <span class="veg">🟢 Veg</span>
 
@@ -362,9 +373,7 @@ class="btn">
 
     <h3>Hotel Shivbhumi & Mess</h3>
 
-    <span class="favorite" onclick="toggleFavorite(this)">
-    ❤️
-    </span>
+    <button class="fav-btn" onclick="toggleFavorite(this)">🤍 Add to Favorite</button>
 
     <span class="nonveg">🔴 Veg & Non-Veg</span>
 
@@ -429,9 +438,7 @@ class="btn">
 
     <h3>Payal Khanaval</h3>
 
-    <span class="favorite" onclick="toggleFavorite(this)">
-    ❤️
-    </span>
+    <button class="fav-btn" onclick="toggleFavorite(this)">🤍 Add to Favorite</button>
 
     <span class="nonveg">🔴 Veg & Non-Veg</span>
     <p>📍 Pune</p>
@@ -495,9 +502,7 @@ class="btn">
 
     <h3>Nagdev Hotel</h3>
 
-    <span class="favorite" onclick="toggleFavorite(this)">
-    ❤️
-    </span>
+    <button class="fav-btn" onclick="toggleFavorite(this)">🤍 Add to Favorite</button>
 
     <span class="nonveg">🔴 Veg & Non-Veg</span>
 
@@ -561,9 +566,7 @@ class="btn">
 
     <h3>Aaswad Hotel & Family Restaurant</h3>
 
-    <span class="favorite" onclick="toggleFavorite(this)">
-    ❤️
-    </span>
+    <button class="fav-btn" onclick="toggleFavorite(this)">🤍 Add to Favorite</button>
 
     <span class="nonveg">🔴 Veg & Non-Veg</span>
 
@@ -629,9 +632,7 @@ class="btn">
 
     <h3>Hotel Aarambh</h3>
 
-    <span class="favorite" onclick="toggleFavorite(this)">
-    ❤️
-    </span>
+    <button class="fav-btn" onclick="toggleFavorite(this)">🤍 Add to Favorite</button>
 
     <span class="nonveg">🔴 Veg & Non-Veg</span>
 
@@ -697,9 +698,7 @@ class="btn">
 
     <h3>Christy Restaurant</h3>
 
-    <span class="favorite" onclick="toggleFavorite(this)">
-    ❤️
-    </span>
+    <button class="fav-btn" onclick="toggleFavorite(this)">🤍 Add to Favorite</button>
 
     <span class="nonveg">🔴 Veg & Non-Veg</span>
 
@@ -765,9 +764,7 @@ class="btn">
 
     <h3>Maitri Katta</h3>
 
-    <span class="favorite" onclick="toggleFavorite(this)">
-    ❤️
-    </span>
+    <button class="fav-btn" onclick="toggleFavorite(this)">🤍 Add to Favorite</button>
 
     <span class="veg">🟢 Pure Veg</span>
 
@@ -833,9 +830,7 @@ class="btn">
 
     <h3>Swagat Gharghuti Mess</h3>
 
-    <span class="favorite" onclick="toggleFavorite(this)">
-    ❤️
-    </span>
+    <button class="fav-btn" onclick="toggleFavorite(this)">🤍 Add to Favorite</button>
 
     <span class="nonveg">🔴 Veg & Non-Veg</span>
 
@@ -899,9 +894,7 @@ class="btn">
 
     <h3>Shree Swami Samarth</h3>
 
-    <span class="favorite" onclick="toggleFavorite(this)">
-    ❤️
-    </span>
+    <button class="fav-btn" onclick="toggleFavorite(this)">🤍 Add to Favorite</button>
 
     <span class="veg">🟢 Pure Veg</span>
 
@@ -965,9 +958,7 @@ class="btn">
 
     <h3>Sugam Dining Hall</h3>
 
-    <span class="favorite" onclick="toggleFavorite(this)">
-    ❤️
-    </span>
+    <button class="fav-btn" onclick="toggleFavorite(this)">🤍 Add to Favorite</button>
 
     <span class="veg">🟢 Pure Veg</span>
 
@@ -1031,9 +1022,7 @@ class="btn">
 
     <h3>Jai Malhar Hotel & Mess</h3>
 
-    <span class="favorite" onclick="toggleFavorite(this)">
-    ❤️
-    </span>
+    <button class="fav-btn" onclick="toggleFavorite(this)">🤍 Add to Favorite</button>
 
     <span class="nonveg">🔴 Veg & Non-Veg</span>
 
@@ -1095,6 +1084,20 @@ class="btn">
     <p>© 2026 PCCOE/DYP Mess Finder</p>
 </footer>
 
+<div id="menuPopup" class="popup">
+
+<div class="popup-content">
+
+<span class="close" onclick="closeMenuPopup()">&times;</span>
+
+<h2 id="menuPopupTitle">Weekly Menu</h2>
+
+<div id="menuPopupBody"></div>
+
+</div>
+
+</div>
+
 <script type="module">
     import {
   db,
@@ -1102,9 +1105,128 @@ class="btn">
   get
 } from "./db.js";
 
+// ---------- Weekly Menu popup (menu, today's special, price) ----------
+function parseMenuText(text){
+
+    let title = "";
+    let rows = [];
+
+    String(text || "").split(/\r?\n/).forEach(function(raw, i){
+
+        let line = raw.trim();
+        if(!line) return;
+
+        let m = line.match(/^(.*?)\s*[-–—:]?\s*((?:₹|Rs\.?)\s*\d[\d\s,.\-–]*)$/i);
+
+        if(m && m[1].trim()){
+            rows.push({ item: m[1].trim(), price: m[2].trim() });
+            return;
+        }
+
+        // first line like "PATIL MESS MENU" is the title
+        if(rows.length === 0 && !title && /menu\s*$/i.test(line)){
+            title = line;
+            return;
+        }
+
+        // short plain lines (Monday, NON-VEG) are section headings,
+        // longer ones are items without a price
+        if(line.length <= 25 && !/[:,]/.test(line) && !/\s[-–—]\s/.test(line)){
+            rows.push({ heading: line });
+        }else{
+            rows.push({ item: line, price: "-" });
+        }
+    });
+
+    return { title: title, rows: rows };
+}
+
+function showMenuPopup(text, opts){
+
+    opts = opts || {};
+
+    let parsed = parseMenuText(text);
+
+    // Today's special: given for database messes, read from the card for built-in ones
+    let special = opts.special;
+
+    if(special === undefined){
+
+        let src = (window.event && window.event.target) || document.activeElement;
+        let card = src && src.closest ? src.closest(".college-card") : null;
+
+        special = "";
+
+        if(card){
+            card.querySelectorAll("h4").forEach(function(h){
+                if(/today/i.test(h.innerText) && h.nextElementSibling){
+                    special = h.nextElementSibling.innerText.trim();
+                }
+            });
+        }
+    }
+
+    special = String(special || "").trim();
+
+    if(/^(-|n\/a|na|none|not available)$/i.test(special)){
+        special = "";
+    }
+
+    let title = opts.title || parsed.title || "Weekly Menu";
+
+    let html = "";
+
+    if(special){
+        html += `
+<div style="background:#334155; border-left:4px solid #38bdf8; padding:12px 15px; border-radius:10px; margin:15px 0;">
+<h3 style="margin:0 0 6px; color:#38bdf8;">⭐ Today's Special</h3>
+<div style="white-space:pre-line; color:white;">${esc(special)}</div>
+</div>`;
+    }
+
+    if(parsed.rows.length === 0){
+
+        html += '<p style="color:white;">Menu not added yet.</p>';
+
+    }else{
+
+        html += `
+<table style="width:100%; border-collapse:collapse; color:white; margin-top:10px;">
+<thead>
+<tr>
+<th style="text-align:left; padding:8px; border-bottom:2px solid #38bdf8;">📋 Menu</th>
+<th style="text-align:right; padding:8px; border-bottom:2px solid #38bdf8; white-space:nowrap;">💰 Price</th>
+</tr>
+</thead>
+<tbody>`;
+
+        parsed.rows.forEach(function(r){
+
+            if(r.heading){
+                html += `<tr><td colspan="2" style="padding:14px 8px 4px; font-weight:bold; color:#38bdf8;">${esc(r.heading)}</td></tr>`;
+            }else{
+                html += `<tr>
+<td style="padding:8px; border-bottom:1px solid #475569;">${esc(r.item)}</td>
+<td style="padding:8px; border-bottom:1px solid #475569; text-align:right; white-space:nowrap;">${esc(r.price)}</td>
+</tr>`;
+            }
+        });
+
+        html += "</tbody></table>";
+    }
+
+    document.getElementById("menuPopupTitle").innerText = "📋 " + title;
+    document.getElementById("menuPopupBody").innerHTML = html;
+    document.getElementById("menuPopup").style.display = "block";
+}
+
+function closeMenuPopup(){
+    document.getElementById("menuPopup").style.display = "none";
+}
+
 function patilMenu(){
 
-alert(
+showMenuPopup(
 
 "PATIL MESS MENU\n\n"+
 
@@ -1122,7 +1244,7 @@ alert(
 
 function moryaMenu(){
 
-alert(
+showMenuPopup(
 
 "MORYA MESS MENU\n\n"+
 
@@ -1140,7 +1262,7 @@ alert(
 
 function vaishnaviMenu(){
 
-alert(
+showMenuPopup(
 
 "VAISHNAVI MESS MENU\n\n"+
 
@@ -1157,7 +1279,7 @@ alert(
 }
 function dharmarajMenu(){
 
-alert(
+showMenuPopup(
 "DHARMARAJ HOTEL MENU\n\n"+
 
 "Chayani Bhaji - ₹50\n"+
@@ -1178,7 +1300,7 @@ alert(
 }
 function vakratundaMenu(){
 
-alert(
+showMenuPopup(
 "VAKRATUNDA MENU\n\n"+
 
 "Monday\n"+
@@ -1206,7 +1328,7 @@ alert(
 }
 function shivbhumiMenu(){
 
-alert(
+showMenuPopup(
 "HOTEL SHIVBHUMI MENU\n\n"+
 
 "Monday - Chicken Curry + Rice - ₹150\n"+
@@ -1221,7 +1343,7 @@ alert(
 }
 function payalMenu(){
 
-alert(
+showMenuPopup(
 "PAYAL KHANAVAL MENU\n\n"+
 
 "Rice Plate Unlimited - ₹90\n"+
@@ -1245,7 +1367,7 @@ alert(
 }
 function nagdevMenu(){
 
-alert(
+showMenuPopup(
 "NAGDEV HOTEL MENU\n\n"+
 
 "Rice Plate - ₹80\n"+
@@ -1274,7 +1396,7 @@ alert(
 }
 function aaswadMenu(){
 
-alert(
+showMenuPopup(
 "AASWAD HOTEL MENU\n\n"+
 
 "Paneer Masala Thali - ₹110\n"+
@@ -1307,7 +1429,7 @@ alert(
 }
 function aarambhMenu(){
 
-alert(
+showMenuPopup(
 "HOTEL AARAMBH MENU\n\n"+
 
 "VEG\n"+
@@ -1343,7 +1465,7 @@ alert(
 }
 function christyMenu(){
 
-alert(
+showMenuPopup(
 "CHRISTY RESTAURANT MENU\n\n"+
 
 "Veg Thali - ₹100\n"+
@@ -1377,7 +1499,7 @@ alert(
 }
 function maitriMenu(){
 
-alert(
+showMenuPopup(
 "MAITRI KATTA MENU\n\n"+
 
 "Idli Chutney - ₹40\n"+
@@ -1394,7 +1516,7 @@ alert(
 }
 function swagatMenu(){
 
-alert(
+showMenuPopup(
 "SWAGAT GHARGHUTI MESS MENU\n\n"+
 
 "Veg Thali - ₹80\n"+
@@ -1414,7 +1536,7 @@ alert(
 }
 function swamiMenu(){
 
-alert(
+showMenuPopup(
 "SHREE SWAMI SAMARTH MENU\n\n"+
 
 "Veg Thali - ₹100\n"+
@@ -1432,7 +1554,7 @@ alert(
 }
 function sugamMenu(){
 
-alert(
+showMenuPopup(
 "SUGAM DINING HALL MENU\n\n"+
 "Veg Thali - ₹100\n"+
 "Special Veg Thali - ₹150\n"+
@@ -1448,7 +1570,7 @@ alert(
 }
 function jaiMalharMenu(){
 
-alert(
+showMenuPopup(
 "JAI MALHAR HOTEL & MESS MENU\n\n"+
 
 "Veg Thali - ₹100\n"+
@@ -1515,9 +1637,20 @@ function filterMess(type){
         nonvegCards.forEach(card=>card.style.display="block");
     }
 }
+function setFavButton(button, isFavorite){
+
+    if(isFavorite){
+        button.innerHTML = "❤️ Added to Favorite";
+        button.classList.add("added");
+    }else{
+        button.innerHTML = "🤍 Add to Favorite";
+        button.classList.remove("added");
+    }
+}
+
 function toggleFavorite(element){
 
-    let card = element.parentElement;
+    let card = element.closest(".college-card");
 
     let messName =
     card.querySelector("h3").innerText.trim();
@@ -1531,14 +1664,12 @@ function toggleFavorite(element){
     if(index === -1){
 
         favorites.push(messName);
-
-        element.innerHTML = "💖";
+        setFavButton(element, true);
 
     }else{
 
         favorites.splice(index,1);
-
-        element.innerHTML = "❤️";
+        setFavButton(element, false);
     }
 
     localStorage.setItem(
@@ -1636,12 +1767,12 @@ function restoreSavedState(){
         let favorites =
         JSON.parse(localStorage.getItem("favorites")) || [];
 
-        document.querySelectorAll(".favorite").forEach(el => {
+        document.querySelectorAll(".fav-btn").forEach(el => {
 
-            let title = el.parentElement.querySelector("h3");
+            let title = el.closest(".college-card").querySelector("h3");
 
             if(title && favorites.includes(title.innerText.trim())){
-                el.innerHTML = "💖";
+                setFavButton(el, true);
             }
 
         });
@@ -1667,34 +1798,37 @@ function restoreSavedState(){
     });
 }
 
-window.addEventListener("load", function(){
+function highlightFromHash(){
 
-loadDatabaseMesses();
-    restoreSavedState();
     let hash = window.location.hash;
 
-    if(hash){
+    if(!hash) return;
 
-        let card = null;
+    let card = null;
 
-        try{
-            card = document.querySelector(hash);
-        }catch(error){
-            card = null;
-        }
+    try{
+        card = document.getElementById(decodeURIComponent(hash.slice(1)));
+    }catch(error){
+        card = null;
+    }
 
-        if(card){
+    if(card){
 
-            card.classList.add("highlight");
+        card.classList.add("highlight");
 
-            card.scrollIntoView({
-                behavior:"smooth",
-                block:"center"
-            });
-
-        }
+        card.scrollIntoView({
+            behavior:"smooth",
+            block:"center"
+        });
 
     }
+}
+
+window.addEventListener("load", function(){
+
+    loadDatabaseMesses();
+    restoreSavedState();
+    highlightFromHash();
 
 });
 // Escapes text before it is placed in the page
@@ -1706,6 +1840,22 @@ function esc(value){
     .replace(/"/g,"&quot;")
     .replace(/'/g,"&#39;");
 }
+
+// Weekly Menu button on cards of messes stored in the database
+let dynamicMessData = {};
+
+document.addEventListener("click", function(e){
+
+    let btn = e.target.closest(".dyn-menu-btn");
+    if(!btn) return;
+
+    let mess = dynamicMessData[btn.dataset.key] || {};
+
+    showMenuPopup(mess.menu || "", {
+        title: (mess.name || "Mess") + " Menu",
+        special: mess.todaySpecial || ""
+    });
+});
 
 // Ratings for messes stored in the database are saved on the server
 document.addEventListener("click", async function(e){
@@ -1762,6 +1912,8 @@ const data = snapshot.val();
 
 let html = "";
 
+dynamicMessData = data;
+
 Object.entries(data).filter(([k,v])=>v).forEach(([key,mess])=>{
 
 let reviews = Array.isArray(mess.reviews)
@@ -1781,7 +1933,7 @@ t.includes("non") ? " nonveg-card" :
 
 html += `
 
-<div class="college-card${typeClass}">
+<div class="college-card${typeClass}" id="${esc(key)}">
 
 <img src="${esc(
 mess.photo ||
@@ -1789,6 +1941,8 @@ mess.photo ||
 )}" alt="Mess">
 
 <h3>${esc(mess.name)}</h3>
+
+<button class="fav-btn" onclick="toggleFavorite(this)">🤍 Add to Favorite</button>
 
 <p>📍 ${esc(mess.location)}</p>
 
@@ -1815,19 +1969,25 @@ mess.photo ||
 
 <p class="dyn-thanks"></p>
 
-<p style="white-space:pre-line;">${esc(mess.menu || "")}</p>
+${mess.todaySpecial ? `<h4>Today's Special</h4>
 
-<a href="${esc(mess.mapLink || '#')}"
+<p style="white-space:pre-line;">${esc(mess.todaySpecial)}</p>` : ""}
+
+<button class="dyn-menu-btn" data-key="${esc(key)}">📋 Weekly Menu</button>
+
+<br><br>
+
+${mess.mapLink ? `<a href="${esc(mess.mapLink)}"
 class="btn"
 target="_blank">
 📍 Location
-</a>
+</a>` : ""}
 
-<a href="${esc(mess.whatsappLink || '#')}"
+${mess.whatsappLink ? `<a href="${esc(mess.whatsappLink)}"
 class="btn"
 target="_blank">
 💬 WhatsApp
-</a>
+</a>` : ""}
 
 </div>
 
@@ -1836,6 +1996,9 @@ target="_blank">
 });
 
 container.innerHTML = html;
+
+restoreSavedState();
+highlightFromHash();
 
 }catch(error){
 
@@ -1851,7 +2014,8 @@ Object.assign(window, {
     patilMenu, moryaMenu, vaishnaviMenu, dharmarajMenu, vakratundaMenu,
     shivbhumiMenu, payalMenu, nagdevMenu, aaswadMenu, aarambhMenu,
     christyMenu, maitriMenu, swagatMenu, swamiMenu, sugamMenu, jaiMalharMenu,
-    searchMess, filterMess, toggleFavorite, findLocation, submitRating
+    searchMess, filterMess, toggleFavorite, findLocation, submitRating,
+    showMenuPopup, closeMenuPopup
 });
 </script>
 

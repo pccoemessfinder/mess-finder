@@ -24,6 +24,7 @@
 
         <ul>
             <li><a href="index.html">Home</a></li>
+            <li><a href="#" onclick="openFavorites(event)">❤️ Favorites</a></li>
             <li><a href="contact.html">Contact</a></li>
             <li><a href="owner-login.html">Owner Login</a></li>
             <li><a href="login.html">Admin Login</a></li>
@@ -64,52 +65,6 @@ Discover the best Veg & Non-Veg messes, dining halls and student meal services.
     <button class="btn" onclick="openMessFilters()">
 Explore Now
 </button>
-<br><br>
-
-<button class="btn" onclick="openNearbyFilter()">
-📍 Find Messes Near Me
-</button>
-
-<div id="nearbyFilter" style="display:none; margin-top:20px;">
-
-    <h3>🔎 Find Messes Near You</h3>
-
-    <button onclick="getCurrentLocation()">
-        📍 Use My Current Location
-    </button>
-
-    <br><br>
-
-    <label><b>💰 Price</b></label>
-    <select id="priceFilter">
-    <option value="All">All Prices</option>
-    <option value="50">₹50 or below</option>
-    <option value="50-70">₹50–₹70</option>
-    <option value="70-90">₹70–₹90</option>
-    <option value="90-100">₹90–₹100</option>
-    <option value="100-120">₹100–₹120</option>
-    <option value="120-150">₹120–₹150</option>
-    <option value="150+">₹150+</option>
-</select>
-
-    <br><br>
-
-    <label><b>🍛 Food Type</b></label>
-    <select id="typeFilter">
-        <option value="all">Veg & Non-Veg</option>
-        <option value="Veg">🟢 Veg</option>
-        <option value="Non-Veg">🔴 Non-Veg</option>
-    </select>
-
-    <br><br>
-
-    <button class="btn" onclick="searchNearbyMesses()">
-        🔍 Find Messes
-    </button>
-
-</div>
-
-<p id="locationResult"></p>
 </section>
 <!-- Mess Filter Screen -->
 <div id="messFilterScreen" style="
@@ -130,6 +85,12 @@ Explore Now
     <h2>🍛 Find Mess Near You</h2>
 
     <p>Select your preferred distance, price and food type.</p>
+
+    <div class="search-box">
+        <input type="text" id="messSearch"
+        placeholder="🔍 Search mess by name or location..."
+        oninput="findFilteredMesses()">
+    </div>
 
 <button class="btn" onclick="getUserLocation()">
     📍 Use My Current Location
@@ -184,46 +145,7 @@ Explore Now
 </div>
 
 
-<!-- Featured Messes -->
-<section id="messes">
-
-    <h2>Featured Messes</h2>
-
-    <div class="college-container">
-
-        <div class="college-card">
-            <h3>Patil Mess</h3>
-            <p>₹3000 / Month</p>
-            <p>⭐ 4.5 Rating</p>
-        </div>
-
-        <div class="college-card">
-            <h3>Hotel Morya & Mess</h3>
-            <p>₹3200 / Month</p>
-            <p>⭐ 4.7 Rating</p>
-        </div>
-
-        <div class="college-card">
-            <h3>Vaishnavi Mess</h3>
-            <p>₹3500 / Month</p>
-            <p>⭐ 4.6 Rating</p>
-        </div>
-
-    </div>
-
-</section>
-
 <!-- About Section -->
-<section id="about">
-<section id="favorites">
-
-    <h2>❤️ Favorite Messes</h2>
-
-    <div id="favoriteList">
-        No favorites added yet
-    </div>
-
-</section>
 <section id="about">
 
     <h2>About Us</h2>
@@ -398,7 +320,12 @@ window.onload = function(){
     }
 
     loadStatistics();
-    loadFavorites();
+
+    // keep the statistics fresh when messes are added/removed elsewhere
+    setInterval(loadStatistics, 30000);
+    document.addEventListener("visibilitychange", function(){
+        if(!document.hidden){ loadStatistics(); }
+    });
 }
 function findLocation(){
 
@@ -423,16 +350,30 @@ function findLocation(){
     }
 
 }
-function loadStatistics(){
+async function loadStatistics(){
 
-document.getElementById("totalMesses").innerText =
-document.querySelectorAll("#messList .mess-item").length;
-document.getElementById("vegMesses").innerText =
-document.querySelectorAll("#messList .mess-item.veg").length;
-document.getElementById("nonVegMesses").innerText =
-document.querySelectorAll("#messList .mess-item.nonveg").length;
+    // built-in messes written in the page
+    let total = document.querySelectorAll("#messList .mess-item").length;
+    let veg = document.querySelectorAll("#messList .mess-item.veg").length;
+    let nonVeg = document.querySelectorAll("#messList .mess-item.nonveg").length;
 
+    // plus every mess stored in the database (added by admin or owners)
+    const dbMesses = await getDbMesses(true);
+
+    dbMesses.forEach(function(m){
+        total++;
+        if(m.type === "Non-Veg"){
+            nonVeg++;
+        }else if(m.type === "Veg" || m.type === "Veg & Non-Veg"){
+            veg++;
+        }
+    });
+
+    document.getElementById("totalMesses").innerText = total;
+    document.getElementById("vegMesses").innerText = veg;
+    document.getElementById("nonVegMesses").innerText = nonVeg;
 }
+
 async function saveSuggestion(){
 
     let suggestion =
@@ -522,45 +463,261 @@ function toggleMenu(){
     .classList.toggle("active");
 
 }
-function loadFavorites(){
+// ----- Favorites (opened from the menu) -----
+function escHtml(v){
+    return String(v === undefined || v === null ? "" : v)
+    .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;").replace(/'/g,"&#39;");
+}
 
-    let favorites =
-    JSON.parse(localStorage.getItem("favorites")) || [];
+async function openFavorites(e){
 
-    let favoriteList =
-    document.getElementById("favoriteList");
+    if(e){ e.preventDefault(); }
+
+    document.getElementById("navMenu").classList.remove("active");
+    document.getElementById("favoritesScreen").style.display = "block";
+
+    await renderFavorites();
+}
+
+function closeFavorites(){
+    document.getElementById("favoritesScreen").style.display = "none";
+}
+
+async function renderFavorites(){
+
+    let box = document.getElementById("favoriteList");
+
+    let favorites = [];
+    try{
+        favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+    }catch(err){
+        favorites = [];
+    }
 
     if(favorites.length === 0){
-
-        favoriteList.innerHTML =
-        "No favorites added yet";
-
+        box.innerText =
+        "No favorites added yet. Open a mess and tap Add to Favorite.";
         return;
     }
 
-    favoriteList.innerHTML = "";
+    const all = BUILTIN_MESSES.concat(await getDbMesses());
 
-    favorites.forEach(name => {
+    let html = "";
 
-        let item =
-        document.createElement("div");
+    favorites.forEach(function(name, index){
 
-        item.className = "college-card";
+        const found = all.find(function(m){
+            return m.name.trim().toLowerCase() === String(name).trim().toLowerCase();
+        });
 
-        item.innerHTML = `
-    <h3>❤️ ${name}</h3>
-
-    <a href="messes.html" class="btn">
-        Explore Now
-    </a>
-
-    
+        html += `
+<div class="college-card">
+    <h3>❤️ ${escHtml(name)}</h3>
+    ${found ? `<p>${escHtml(found.mealPrice)}</p>
+    <a href="messes.html#${escHtml(found.id)}" class="btn">View Mess</a>`
+    : `<p>This mess is no longer listed.</p>`}
+    <button class="btn" onclick="removeFavorite(${index})">Remove</button>
+</div>
 `;
-
-        favoriteList.appendChild(item);
-
     });
+
+    box.innerHTML = html;
 }
+
+function removeFavorite(index){
+
+    let favorites = [];
+    try{
+        favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+    }catch(err){
+        favorites = [];
+    }
+
+    favorites.splice(index, 1);
+    localStorage.setItem("favorites", JSON.stringify(favorites));
+
+    renderFavorites();
+}
+
+// ----- Messes saved in the database (added by admin or owners) -----
+let dbMessesCache = [];
+let dbMessesFetchedAt = 0;
+
+function normalizeType(t){
+
+    t = String(t || "").trim().toLowerCase();
+
+    if(t.includes("&") || t.includes("both")) return "Veg & Non-Veg";
+    if(t.includes("non")) return "Non-Veg";
+    if(t.includes("veg")) return "Veg";
+    return "Not specified";
+}
+
+async function getDbMesses(force){
+
+    if(!force && Date.now() - dbMessesFetchedAt < 20000){
+        return dbMessesCache;
+    }
+
+    try{
+        const res = await fetch("/api/messes?basic=1");
+        if(!res.ok){ throw new Error("failed"); }
+        const data = await res.json();
+
+        dbMessesCache = Object.entries(data || {})
+        .filter(function(pair){ return pair[1]; })
+        .map(function(pair){
+            const m = pair[1];
+            return {
+                id: pair[0],
+                name: m.name || "Mess",
+                location: m.location || "Pune",
+                mealPrice: m.price || "See details",
+                type: normalizeType(m.type)
+            };
+        });
+
+        dbMessesFetchedAt = Date.now();
+    }catch(err){
+        console.log("Could not load messes from the database");
+    }
+
+    return dbMessesCache;
+}
+
+const BUILTIN_MESSES = [
+
+    {
+        id: "patilMess",
+        name: "Patil Mess",
+        location: "Pune",
+        mealPrice: "₹3000 per month",
+        type: "Veg"
+    },
+
+    {
+        id: "moryaMess",
+        name: "Hotel Morya & Mess",
+        location: "Pune",
+        mealPrice: "₹3200 per month",
+        type: "Veg"
+    },
+
+    {
+        id: "vaishnaviMess",
+        name: "Vaishnavi Mess",
+        location: "Pune",
+        mealPrice: "₹3500 per month",
+        type: "Non-Veg"
+    },
+
+    {
+        id: "dharmarajMess",
+        name: "Dharmaraj Hotel",
+        location: "Pune",
+        mealPrice: "See details",
+        type: "Non-Veg"
+    },
+
+    {
+        id: "vakratundaMess",
+        name: "Vakratunda",
+        location: "Pune",
+        mealPrice: "₹3000 per month",
+        type: "Veg"
+    },
+
+    {
+        id: "shivbhumiMess",
+        name: "Hotel Shivbhumi & Mess",
+        location: "Pune",
+        mealPrice: "₹100 - ₹180 per meal",
+        type: "Non-Veg"
+    },
+
+    {
+        id: "payalMess",
+        name: "Payal Khanaval",
+        location: "Pune",
+        mealPrice: "₹80 - ₹150 per meal",
+        type: "Non-Veg"
+    },
+
+    {
+        id: "nagdevMess",
+        name: "Nagdev Hotel",
+        location: "Pune",
+        mealPrice: "₹50 - ₹150 per meal",
+        type: "Non-Veg"
+    },
+
+    {
+        id: "aaswadMess",
+        name: "Aaswad Hotel & Family Restaurant",
+        location: "Pune",
+        mealPrice: "₹40 - ₹170 per meal",
+        type: "Non-Veg"
+    },
+
+    {
+        id: "aarambhMess",
+        name: "Hotel Aarambh",
+        location: "Pune",
+        mealPrice: "₹10 - ₹120 per meal",
+        type: "Non-Veg"
+    },
+
+    {
+        id: "christyMess",
+        name: "Christy Restaurant",
+        location: "Pune",
+        mealPrice: "₹10 - ₹260 per meal",
+        type: "Non-Veg"
+    },
+
+    {
+        id: "maitriMess",
+        name: "Maitri Katta",
+        location: "Pune",
+        mealPrice: "₹30 - ₹120 per meal",
+        type: "Veg"
+    },
+
+    {
+        id: "swagatMess",
+        name: "Swagat Gharghuti Mess",
+        location: "Pune",
+        mealPrice: "₹10 - ₹130 per meal",
+        type: "Non-Veg"
+    },
+
+    {
+        id: "swamiMess",
+        name: "Shree Swami Samarth",
+        location: "Pune",
+        mealPrice: "₹40 - ₹140 per meal",
+        type: "Veg"
+    },
+
+    {
+        id: "sugamMess",
+        name: "Sugam Dining Hall",
+        location: "Pune",
+        mealPrice: "₹50 - ₹150 per meal",
+        type: "Veg"
+    },
+
+    {
+        id: "jaimalharMess",
+        name: "Jai Malhar Hotel & Mess",
+        location: "Pune",
+        mealPrice: "₹60 per meal",
+        type: "Veg & Non-Veg"
+    }
+
+];
+
 function closeMessFilters() {
     document.getElementById("messFilterScreen").style.display = "none";
 }
@@ -614,7 +771,11 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
     return R * c;
 }
 
-function findFilteredMesses() {
+let filterRequest = 0;
+
+async function findFilteredMesses() {
+
+    const myRequest = ++filterRequest;
 
     const resultBox =
         document.getElementById("filteredMessResults");
@@ -628,138 +789,8 @@ function findFilteredMesses() {
         document.getElementById("foodTypeFilter").value;
 
 
-    // Existing messes
-    const messes = [
-
-        {
-            id: "patilMess",
-            name: "Patil Mess",
-            location: "Pune",
-            mealPrice: "₹3000 per month",
-            type: "Veg"
-        },
-
-        {
-            id: "moryaMess",
-            name: "Hotel Morya & Mess",
-            location: "Pune",
-            mealPrice: "₹3200 per month",
-            type: "Veg"
-        },
-
-        {
-            id: "vaishnaviMess",
-            name: "Vaishnavi Mess",
-            location: "Pune",
-            mealPrice: "₹3500 per month",
-            type: "Non-Veg"
-        },
-
-        {
-            id: "dharmarajMess",
-            name: "Dharmaraj Hotel",
-            location: "Pune",
-            mealPrice: "See details",
-            type: "Non-Veg"
-        },
-
-        {
-            id: "vakratundaMess",
-            name: "Vakratunda",
-            location: "Pune",
-            mealPrice: "₹3000 per month",
-            type: "Veg"
-        },
-
-        {
-            id: "shivbhumiMess",
-            name: "Hotel Shivbhumi & Mess",
-            location: "Pune",
-            mealPrice: "₹100 - ₹180 per meal",
-            type: "Non-Veg"
-        },
-
-        {
-            id: "payalMess",
-            name: "Payal Khanaval",
-            location: "Pune",
-            mealPrice: "₹80 - ₹150 per meal",
-            type: "Non-Veg"
-        },
-
-        {
-            id: "nagdevMess",
-            name: "Nagdev Hotel",
-            location: "Pune",
-            mealPrice: "₹50 - ₹150 per meal",
-            type: "Non-Veg"
-        },
-
-        {
-            id: "aaswadMess",
-            name: "Aaswad Hotel & Family Restaurant",
-            location: "Pune",
-            mealPrice: "₹40 - ₹170 per meal",
-            type: "Non-Veg"
-        },
-
-        {
-            id: "aarambhMess",
-            name: "Hotel Aarambh",
-            location: "Pune",
-            mealPrice: "₹10 - ₹120 per meal",
-            type: "Non-Veg"
-        },
-
-        {
-            id: "christyMess",
-            name: "Christy Restaurant",
-            location: "Pune",
-            mealPrice: "₹10 - ₹260 per meal",
-            type: "Non-Veg"
-        },
-
-        {
-            id: "maitriMess",
-            name: "Maitri Katta",
-            location: "Pune",
-            mealPrice: "₹30 - ₹120 per meal",
-            type: "Veg"
-        },
-
-        {
-            id: "swagatMess",
-            name: "Swagat Gharghuti Mess",
-            location: "Pune",
-            mealPrice: "₹10 - ₹130 per meal",
-            type: "Non-Veg"
-        },
-
-        {
-            id: "swamiMess",
-            name: "Shree Swami Samarth",
-            location: "Pune",
-            mealPrice: "₹40 - ₹140 per meal",
-            type: "Veg"
-        },
-
-        {
-            id: "sugamMess",
-            name: "Sugam Dining Hall",
-            location: "Pune",
-            mealPrice: "₹50 - ₹150 per meal",
-            type: "Veg"
-        },
-
-        {
-            id: "jaimalharMess",
-            name: "Jai Malhar Hotel & Mess",
-            location: "Pune",
-            mealPrice: "₹60 per meal",
-            type: "Veg & Non-Veg"
-        }
-
-    ];
+    // Built-in messes plus the ones saved in the database
+    const messes = BUILTIN_MESSES.concat(await getDbMesses());
 
 
     // Price filtering
@@ -864,13 +895,36 @@ function findFilteredMesses() {
     }
 
 
+    // Search bar (name, location or food type)
+    const searchBox = document.getElementById("messSearch");
+    const searchText =
+        (searchBox ? searchBox.value : "").trim().toLowerCase();
+
+    function searchMatches(mess) {
+
+        if (searchText === "") {
+            return true;
+        }
+
+        return (
+            mess.name + " " + mess.location + " " + mess.type
+        ).toLowerCase().includes(searchText);
+    }
+
+
     // Apply filters
     const filteredMesses =
         messes.filter(mess =>
             priceMatches(mess) &&
             foodMatches(mess) &&
-            distanceMatches(mess)
+            distanceMatches(mess) &&
+            searchMatches(mess)
         );
+
+    // a newer search started while we were loading
+    if (myRequest !== filterRequest) {
+        return;
+    }
 
 
     console.log(
@@ -919,7 +973,7 @@ function showFilteredMessResults(messes) {
 
         resultBox.innerHTML += `
             <div
-                onclick="window.location.href='messes.html#${mess.id}'"
+                onclick="window.location.href='messes.html#${escHtml(mess.id)}'"
                 style="
                     background:white;
                     color:#222;
@@ -940,22 +994,22 @@ function showFilteredMessResults(messes) {
                     margin-top:0;
                     color:#111;
                 ">
-                    🍛 ${mess.name}
+                    🍛 ${escHtml(mess.name)}
                 </h3>
 
                 <p>
                     📍 <b>Location:</b>
-                    ${mess.location || "Pune"}
+                    ${escHtml(mess.location || "Pune")}
                 </p>
 
                 <p>
                     🍽️ <b>Food Type:</b>
-                    ${mess.type || "Not specified"}
+                    ${escHtml(mess.type || "Not specified")}
                 </p>
 
                 <p>
                     💰 <b>Price:</b>
-                    ${mess.mealPrice || "See mess details"}
+                    ${escHtml(mess.mealPrice || "See mess details")}
                 </p>
 
                 <p style="
@@ -1008,33 +1062,6 @@ function getUserLocation() {
     requestUserLocation("userLocationStatus");
 }
 
-// "Find Messes Near Me" section on the home page
-// (these three functions were called in the HTML but never defined)
-function openNearbyFilter() {
-
-    const box = document.getElementById("nearbyFilter");
-
-    box.style.display =
-        box.style.display === "none" ? "block" : "none";
-}
-
-function getCurrentLocation() {
-    requestUserLocation("locationResult");
-}
-
-function searchNearbyMesses() {
-
-    // Copy the home-page filters into the main filter screen and open it
-    document.querySelector("#messFilterScreen #priceFilter").value =
-        document.querySelector("#nearbyFilter #priceFilter").value;
-
-    const type = document.getElementById("typeFilter").value;
-
-    document.getElementById("foodTypeFilter").value =
-        type === "all" ? "All" : type;
-
-    openMessFilters();
-}
 </script>
 <script>
 
@@ -1094,6 +1121,22 @@ function popupFilter(type){
 }
 
 </script>
+<div id="favoritesScreen" class="popup">
+
+<div class="popup-content">
+
+<span class="close" onclick="closeFavorites()">&times;</span>
+
+<h2>❤️ Favorite Messes</h2>
+
+<div id="favoriteList">
+    No favorites added yet
+</div>
+
+</div>
+
+</div>
+
 <div id="messPopup" class="popup">
 
 <div class="popup-content">

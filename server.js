@@ -92,6 +92,7 @@ function pickFields(body) {
   if ("price" in body) out.price = clip(body.price, 60);
   if ("type" in body) out.type = clip(body.type, 30);
   if ("menu" in body) out.menu = clip(body.menu, 5000);
+  if ("todaySpecial" in body) out.todaySpecial = clip(body.todaySpecial, 500);
   if ("contactNumber" in body) out.contactNumber = clip(body.contactNumber, 30);
   if ("openTime" in body) out.openTime = clip(body.openTime, 20);
   if ("closeTime" in body) out.closeTime = clip(body.closeTime, 20);
@@ -99,6 +100,39 @@ function pickFields(body) {
   if ("mapLink" in body) out.mapLink = safeUrl(body.mapLink);
   if ("photo" in body) out.photo = safePhoto(body.photo); // null = invalid
   return out;
+}
+
+// ---------- email notifications (contact form + suggestions) ----------
+// Uses Resend's web API (Render's free plan blocks normal SMTP/Gmail ports).
+// Needs RESEND_API_KEY in Render's Environment tab. MAIL_TO defaults to the Mess Finder inbox.
+const MAIL_TO = process.env.MAIL_TO || "messfinderpccoe@gmail.com";
+const MAIL_FROM = process.env.MAIL_FROM || "Mess Finder <onboarding@resend.dev>";
+
+function sendMail(subject, text, replyTo) {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    console.warn("Email not sent: RESEND_API_KEY is not set.");
+    return;
+  }
+  const payload = {
+    from: MAIL_FROM,
+    to: [MAIL_TO],
+    subject: String(subject).replace(/[\r\n]+/g, " ").slice(0, 200),
+    text: String(text).slice(0, 10000)
+  };
+  if (replyTo) payload.reply_to = replyTo;
+
+  // fire and forget: a failed email must never stop the message from being saved
+  fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: "Bearer " + apiKey },
+    body: JSON.stringify(payload),
+    signal: AbortSignal.timeout(10000)
+  })
+    .then(async (r) => {
+      if (!r.ok) console.error("Email failed:", r.status, (await r.text()).slice(0, 300));
+    })
+    .catch((err) => console.error("Email failed:", err.message));
 }
 
 // ---------- rate limits ----------
@@ -166,8 +200,11 @@ async function main() {
 
   // ----- messes -----
   // All messes (public). Returned as an object keyed by id, like the old Firebase data.
-  app.get("/api/messes", async (_req, res) => {
-    const docs = await messes.find({}).toArray();
+  // ?basic=1 leaves out photos/menus/reviews (the home page only needs name, type and price)
+  app.get("/api/messes", async (req, res) => {
+    const docs = await messes
+      .find({}, req.query.basic ? { projection: { photo: 0, menu: 0, reviews: 0 } } : {})
+      .toArray();
     const out = {};
     for (const d of docs) out[d._id] = publicMess(d);
     res.json(out);
@@ -297,6 +334,11 @@ async function main() {
       return res.status(400).json({ error: "Please enter your name, a valid email and a message." });
     }
     await contacts.insertOne({ name, email, message, createdAt: new Date() });
+    sendMail(
+      "Mess Finder - new contact message from " + name,
+      "Name: " + name + "\nEmail: " + email + "\n\nMessage:\n" + message,
+      email
+    );
     res.json({ ok: true });
   });
 
@@ -304,6 +346,7 @@ async function main() {
     const suggestion = clip(req.body?.suggestion, 3000);
     if (!suggestion) return res.status(400).json({ error: "Please write your suggestion." });
     await suggestions.insertOne({ suggestion, createdAt: new Date() });
+    sendMail("Mess Finder - new suggestion", "New suggestion:\n\n" + suggestion);
     res.json({ ok: true });
   });
 
