@@ -112,11 +112,11 @@ border-radius:10px;
 <h2>📞 Contact Number</h2>
 <input type="text" id="contactNumber">
 
-<h2>💬 WhatsApp Link</h2>
-<input type="text" id="whatsappLink">
+<h2>💬 WhatsApp Number</h2>
+<input type="text" id="whatsappNumber" placeholder="e.g. 9876543210">
 
-<h2>📍 Google Maps Link</h2>
-<input type="text" id="mapLink" placeholder="https://maps.app.goo.gl/...">
+<h2>📍 Google Maps Link or Latitude, Longitude</h2>
+<input type="text" id="mapLink" placeholder="https://maps.app.goo.gl/...  OR  18.6510, 73.7730">
 
 <h2>🕒 Opening Time</h2>
 <input type="time" id="openTime">
@@ -150,6 +150,17 @@ No Reviews Yet
 <button class="logout" onclick="logout()">
 🚪 Logout
 </button>
+
+<button class="logout" onclick="showDeleteBox()" style="background:#7f1d1d;">
+🗑 Delete My Mess
+</button>
+
+<div id="deleteBox" style="display:none; margin-top:15px; padding:15px; border:1px solid #fca5a5; border-radius:10px; background:#fef2f2;">
+<p><b>This permanently deletes your mess, its photo, menu and ratings.</b><br>Enter your password to confirm.</p>
+<input type="password" id="deletePassword" placeholder="Your owner password">
+<button class="logout" onclick="deleteMyMess()">Yes, delete my mess</button>
+<button onclick="hideDeleteBox()" style="background:#64748b;">Cancel</button>
+</div>
 
 </div>
 
@@ -225,8 +236,11 @@ ownerMess.menu || "";
 document.getElementById("contactNumber").value =
 ownerMess.contactNumber || "";
 
-document.getElementById("whatsappLink").value =
-ownerMess.whatsappLink || "";
+{
+const legacy = String(ownerMess.whatsappLink || "").match(/wa\.me\/(\d+)/i);
+document.getElementById("whatsappNumber").value =
+ownerMess.whatsappNumber || (legacy ? legacy[1] : "");
+}
 
 document.getElementById("mapLink").value =
 ownerMess.mapLink || "";
@@ -297,8 +311,9 @@ document.getElementById("menu").value;
 ownerMess.contactNumber =
 document.getElementById("contactNumber").value;
 
-ownerMess.whatsappLink =
-document.getElementById("whatsappLink").value;
+ownerMess.whatsappNumber =
+document.getElementById("whatsappNumber").value.trim();
+delete ownerMess.whatsappLink;
 
 ownerMess.mapLink =
 document.getElementById("mapLink").value;
@@ -316,7 +331,7 @@ try{
         ownerMess
     );
 }catch(error){
-    alert("Error: " + error);
+    alert("Error: " + (error.message || error));
     return;
 }
 
@@ -339,7 +354,8 @@ reviewDiv.innerHTML =
 return;
 }
 
-let html = "";
+let sum = reviews.reduce((s,r) => s + Number(r.rating || 0), 0);
+let html = `<p><b>⭐ Overall Rating: ${(sum / reviews.length).toFixed(1)} / 5 (${reviews.length} ${reviews.length === 1 ? "rating" : "ratings"})</b></p>`;
 
 reviews.forEach(review => {
 
@@ -367,6 +383,52 @@ window.location.href =
 
 }
 
+function showDeleteBox(){
+document.getElementById("deleteBox").style.display = "block";
+document.getElementById("deletePassword").focus();
+}
+
+function hideDeleteBox(){
+document.getElementById("deleteBox").style.display = "none";
+document.getElementById("deletePassword").value = "";
+}
+
+async function deleteMyMess(){
+
+const password = document.getElementById("deletePassword").value;
+
+if(!password){
+alert("Please enter your password.");
+return;
+}
+
+if(!confirm("Are you sure? This cannot be undone.")) return;
+
+try{
+    const res = await fetch("/api/owner/delete-mess", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + (localStorage.getItem("authToken") || "")
+        },
+        body: JSON.stringify({ password: password })
+    });
+    const out = await res.json().catch(() => ({}));
+    if(!res.ok) throw new Error(out.error || "Could not delete");
+}catch(error){
+    alert("Error: " + error.message);
+    return;
+}
+
+localStorage.removeItem("ownerLoggedIn");
+localStorage.removeItem("authToken");
+alert("Your mess has been deleted.");
+window.location.href = "owner-login.html";
+}
+
+window.showDeleteBox = showDeleteBox;
+window.hideDeleteBox = hideDeleteBox;
+window.deleteMyMess = deleteMyMess;
 window.saveDetails = saveDetails;
 window.previewPhoto = previewPhoto;
 window.logout = logout;

@@ -134,9 +134,9 @@ h2{
 
     <input type="text" id="contactNumber" placeholder="Contact Number (optional)">
 
-    <input type="text" id="whatsappLink" placeholder="WhatsApp link, https://... (optional)">
+    <input type="text" id="whatsappNumber" placeholder="WhatsApp number, e.g. 9876543210 (optional)">
 
-    <input type="text" id="mapLink" placeholder="Google Maps link, https://... (optional)">
+    <input type="text" id="mapLink" placeholder="Google Maps link OR latitude, longitude (optional)">
 
     <label>Opening Time</label>
     <input type="time" id="openTime">
@@ -261,6 +261,12 @@ async function loadMesses(){
     }
 }
 
+// old messes saved a wa.me link; show its number
+function waFromLink(link){
+    const m = String(link || "").match(/wa\.me\/(\d+)/i);
+    return m ? m[1] : "";
+}
+
 function readForm(){
     return {
         name: document.getElementById("messName").value.trim(),
@@ -268,7 +274,7 @@ function readForm(){
         price: document.getElementById("messPrice").value.trim(),
         type: document.getElementById("messType").value,
         contactNumber: document.getElementById("contactNumber").value.trim(),
-        whatsappLink: document.getElementById("whatsappLink").value.trim(),
+        whatsappNumber: document.getElementById("whatsappNumber").value.trim(),
         mapLink: document.getElementById("mapLink").value.trim(),
         openTime: document.getElementById("openTime").value,
         closeTime: document.getElementById("closeTime").value
@@ -278,7 +284,7 @@ function readForm(){
 function resetForm(){
     editKey = null;
     ["messName","messLocation","messPrice","messType","ownerEmail","ownerPassword",
-     "contactNumber","whatsappLink","mapLink","openTime","closeTime"]
+     "contactNumber","whatsappNumber","mapLink","openTime","closeTime"]
     .forEach(id => { document.getElementById(id).value = ""; });
 
     document.getElementById("ownerEmail").disabled = false;
@@ -333,7 +339,7 @@ function editMess(index){
     document.getElementById("messPrice").value = m.price || "";
     document.getElementById("messType").value = m.type || "";
     document.getElementById("contactNumber").value = m.contactNumber || "";
-    document.getElementById("whatsappLink").value = m.whatsappLink || "";
+    document.getElementById("whatsappNumber").value = m.whatsappNumber || waFromLink(m.whatsappLink);
     document.getElementById("mapLink").value = m.mapLink || "";
     document.getElementById("openTime").value = m.openTime || "";
     document.getElementById("closeTime").value = m.closeTime || "";

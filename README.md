@@ -51,10 +51,11 @@ npm start               # http://localhost:3000
   device. Add, edit and delete are saved to MongoDB straight away. The owner email is the owner's login id,
   so it cannot be changed after adding. Leave the password blank when editing to keep the current one.
 - **Owners** (`owner-login.html` -> `owner-dashboard.html`): can register themselves, then edit menu, photo,
-  contact number, WhatsApp link, Google Maps link and timings.
+  contact number, WhatsApp number, Google Maps link (or latitude, longitude) and timings. They can also delete their own mess (asks for their password).
 - **Visitors**: `messes.html` shows the messes stored in MongoDB (under the built-in cards) and can rate
-  them. Ratings and reviews are stored in the mess's `reviews` list and appear on the owner dashboard and
-  the admin dashboard.
+  them. Every card shows **Your Rating** (this visitor's own) and **Overall Rating** (average of everyone's).
+  One visitor = one rating per mess; rating again changes it. Ratings are stored in the mess's `reviews` list
+  (built-in messes: `ratings` collection) and appear on the owner and admin dashboards.
 - Contact messages and suggestions are saved in the `contacts` and `suggestions` collections
   (Atlas -> Browse Collections).
 - Passwords are stored hashed (bcrypt). Photos are stored in the database (resized by the owner dashboard).
@@ -62,5 +63,5 @@ npm start               # http://localhost:3000
 ## Known limitation
 The original 15 messes (Patil, Morya, Vaishnavi, ...) are written directly into `messes.html` with their
 own photos and weekly-menu pop-ups. They are NOT in MongoDB, so the admin dashboard cannot edit or delete
-them, and their star ratings are still saved only in the visitor's own browser. Only messes added through
+them, (their overall rating is stored in the `ratings` collection, though). Only messes added through
 the dashboard or owner registration are fully editable and live-updated.

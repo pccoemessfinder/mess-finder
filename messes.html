@@ -1731,6 +1731,63 @@ function loadOwnerMesses(){
 
 
 }
+// anonymous id so one visitor = one rating per mess (rating again changes it)
+function getVoterId(){
+    try{
+        let id = localStorage.getItem("voterId");
+        if(!id){
+            id = (window.crypto && crypto.randomUUID)
+                ? crypto.randomUUID()
+                : "v-" + Date.now() + "-" + Math.random().toString(36).slice(2, 12);
+            localStorage.setItem("voterId", id);
+        }
+        return id;
+    }catch(e){
+        return "v-" + Math.random().toString(36).slice(2, 14) + Date.now();
+    }
+}
+
+function ratingSlug(name){
+    return String(name).toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "");
+}
+
+function overallText(info){
+    if(!info || !info.count) return "⭐ Overall Rating: No ratings yet";
+    return "⭐ Overall Rating: " + Number(info.average).toFixed(1) + " / 5 (" + info.count +
+        (info.count === 1 ? " rating)" : " ratings)");
+}
+
+// Built-in cards: add an "Overall Rating" line under "Your Rating" and fill it from the server
+async function loadOverallRatings(){
+
+    let all = {};
+
+    try{
+        let res = await fetch("/api/ratings");
+        if(res.ok) all = await res.json();
+    }catch(e){ /* offline: show "No ratings yet" */ }
+
+    document.querySelectorAll('button[onclick^="submitRating"]').forEach(btn => {
+
+        let m = btn.getAttribute("onclick").match(/submitRating\('([^']*)','([^']*)'/);
+        if(!m) return;
+
+        let yours = document.getElementById(m[2]);
+        if(!yours || !yours.parentElement) return;
+
+        let line = yours.parentElement.nextElementSibling;
+
+        if(!line || !line.classList.contains("overall-rating")){
+            line = document.createElement("p");
+            line.className = "overall-rating";
+            line.dataset.slug = ratingSlug(m[1]);
+            yours.parentElement.insertAdjacentElement("afterend", line);
+        }
+
+        line.innerText = overallText(all[ratingSlug(m[1])]);
+    });
+}
+
 function submitRating(messName, ratingId, selectId, thankYouId){
 
     let rating =
@@ -1757,6 +1814,24 @@ function submitRating(messName, ratingId, selectId, thankYouId){
 
     // Clear the dropdown
     document.getElementById(selectId).value = "";
+
+    // Send to the server so everyone's ratings add up in "Overall Rating"
+    fetch("/api/ratings/" + ratingSlug(messName), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ rating: Number(rating), voterId: getVoterId() })
+    })
+    .then(r => r.ok ? r.json() : Promise.reject())
+    .then(info => {
+        let line = document.getElementById(ratingId).parentElement.nextElementSibling;
+        if(line && line.classList.contains("overall-rating")){
+            line.innerText = overallText(info);
+        }
+    })
+    .catch(() => {
+        document.getElementById(thankYouId).innerText =
+        "✅ Saved on this device (could not reach the server).";
+    });
 }
 
 // Re-apply saved favourites (hearts) and the user's saved ratings after a reload
@@ -1828,6 +1903,7 @@ window.addEventListener("load", function(){
 
     loadDatabaseMesses();
     restoreSavedState();
+    loadOverallRatings();
     highlightFromHash();
 
 });
@@ -1880,12 +1956,15 @@ document.addEventListener("click", async function(e){
             {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ rating: Number(rating) })
+                body: JSON.stringify({ rating: Number(rating), voterId: getVoterId() })
             }
         );
         const out = await res.json().catch(() => ({}));
         if(!res.ok) throw new Error(out.error || "Could not save rating");
         thanks.innerText = "✅ Thank you for your response!";
+        try{ localStorage.setItem("rating_" + btn.dataset.key, rating); }catch(e){}
+        card.querySelector(".dyn-your").innerText = rating;
+        card.querySelector(".dyn-overall").innerText = overallText(out);
         card.querySelector(".dyn-rate").value = "";
     }catch(err){
         thanks.innerText = "❌ " + err.message;
@@ -1920,15 +1999,36 @@ let reviews = Array.isArray(mess.reviews)
 ? mess.reviews
 : Object.values(mess.reviews || {});
 
-let ratingText = reviews.length
-? "⭐ " + (reviews.reduce((sum,r)=>sum+Number(r.rating||0),0) / reviews.length).toFixed(1)
-  + " / 5 (" + reviews.length + (reviews.length === 1 ? " rating)" : " ratings)")
-: "⭐ No ratings yet";
+let ratingText = overallText({
+  count: reviews.length,
+  average: reviews.length ? reviews.reduce((sum,r)=>sum+Number(r.rating||0),0) / reviews.length : 0
+});
+
+let yourRating = "0";
+try{ yourRating = localStorage.getItem("rating_" + key) || "0"; }catch(e){}
+
+// Veg = green, Non-Veg = red, both = "Veg & Non-Veg" (same red pill as the built-in cards)
+let rawType = String(mess.type || "").toLowerCase();
+let hasNonVeg = /non[\s-]*veg/.test(rawType);
+let hasVeg = /veg/.test(rawType.replace(/non[\s-]*veg/g, ""));
+let isBoth = /both/.test(rawType) || (hasNonVeg && hasVeg);
+let badge =
+isBoth ? '<span class="nonveg">🔴 Veg & Non-Veg</span>' :
+hasNonVeg ? '<span class="nonveg">🔴 Non-Veg</span>' :
+hasVeg ? '<span class="veg">🟢 Veg</span>' :
+(mess.type ? "<p>🍽 " + esc(mess.type) + "</p>" : "");
+
+// WhatsApp: number (new) or an old wa.me link
+let waNumber = String(mess.whatsappNumber || "").replace(/\D/g, "");
+if(!waNumber){
+    let legacy = String(mess.whatsappLink || "").match(/wa\.me\/(\d+)/i);
+    waNumber = legacy ? legacy[1] : "";
+}
 
 // so the Veg / Non-Veg filter buttons also work on these cards
 let t = (mess.type || "").toLowerCase();
 let typeClass =
-t.includes("non") ? " nonveg-card" :
+t.includes("non") || t.includes("both") ? " nonveg-card" :
 (t.includes("veg") ? " veg-card" : "");
 
 html += `
@@ -1948,13 +2048,15 @@ mess.photo ||
 
 <p>💰 ${esc(mess.price)}</p>
 
-<p>🍽 ${esc(mess.type)}</p>
+${badge}
 
 <p>📞 ${esc(mess.contactNumber || "Not Available")}</p>
 
 <p>🕒 ${esc(mess.openTime || "")} - ${esc(mess.closeTime || "")}</p>
 
-<p>${esc(ratingText)}</p>
+<p>Your Rating: <span class="dyn-your">${esc(yourRating)}</span>/5</p>
+
+<p class="dyn-overall">${esc(ratingText)}</p>
 
 <select class="dyn-rate">
 <option value="">Select Rating</option>
@@ -1983,7 +2085,7 @@ target="_blank">
 📍 Location
 </a>` : ""}
 
-${mess.whatsappLink ? `<a href="${esc(mess.whatsappLink)}"
+${waNumber ? `<a href="https://wa.me/${esc(waNumber)}"
 class="btn"
 target="_blank">
 💬 WhatsApp

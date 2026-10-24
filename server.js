@@ -49,6 +49,35 @@ function safePhoto(v) {
   return null; // invalid
 }
 
+// WhatsApp number: digits only. A 10-digit Indian number gets the 91 country code.
+// Returns "" (empty), a digit string, or null (invalid).
+function cleanWhatsapp(v) {
+  const raw = str(v).trim();
+  if (!raw) return "";
+  let d = raw.replace(/[\s\-()+]/g, "");
+  if (!/^\d+$/.test(d)) return null;
+  if (d.length === 10) d = "91" + d;
+  else if (d.length === 11 && d.startsWith("0")) d = "91" + d.slice(1);
+  return d.length >= 11 && d.length <= 15 ? d : null;
+}
+
+// Map location: a normal http(s) link, OR "latitude, longitude" (turned into a Google Maps link).
+// Returns "" (empty), a link, or null (invalid).
+function cleanMapLocation(v) {
+  const s = clip(v, 2000);
+  if (!s) return "";
+  const m = s.match(/^(-?\d{1,3}(?:\.\d+)?)\s*[,\s]\s*(-?\d{1,3}(?:\.\d+)?)$/);
+  if (m) {
+    const lat = Number(m[1]);
+    const lng = Number(m[2]);
+    if (Math.abs(lat) <= 90 && Math.abs(lng) <= 180) {
+      return "https://www.google.com/maps?q=" + lat + "," + lng;
+    }
+    return null;
+  }
+  return /^https?:\/\//i.test(s) ? s : null;
+}
+
 const cleanKey = (k) => {
   const key = str(k).trim().toLowerCase();
   return /^[a-z0-9_+\-]{1,200}$/.test(key) ? key : null;
@@ -81,6 +110,10 @@ function safeEqual(a, b) {
 // What the public is allowed to see about a mess (never passwords or email)
 function publicMess(doc) {
   const { _id, ownerPasswordHash, ownerPassword, ownerEmail, ...rest } = doc;
+  if (Array.isArray(rest.reviews)) {
+    // never expose the anonymous voter ids
+    rest.reviews = rest.reviews.map(({ voterId, ...r }) => r);
+  }
   return rest;
 }
 
@@ -96,8 +129,8 @@ function pickFields(body) {
   if ("contactNumber" in body) out.contactNumber = clip(body.contactNumber, 30);
   if ("openTime" in body) out.openTime = clip(body.openTime, 20);
   if ("closeTime" in body) out.closeTime = clip(body.closeTime, 20);
-  if ("whatsappLink" in body) out.whatsappLink = safeUrl(body.whatsappLink);
-  if ("mapLink" in body) out.mapLink = safeUrl(body.mapLink);
+  if ("whatsappNumber" in body) out.whatsappNumber = cleanWhatsapp(body.whatsappNumber); // null = invalid
+  if ("mapLink" in body) out.mapLink = cleanMapLocation(body.mapLink); // null = invalid
   if ("photo" in body) out.photo = safePhoto(body.photo); // null = invalid
   return out;
 }
@@ -235,6 +268,12 @@ async function main() {
     const isAdmin = user?.role === "admin";
     const existing = await messes.findOne({ _id: key });
     const fields = pickFields(body);
+    if (fields.whatsappNumber === null) {
+      return res.status(400).json({ error: "Please enter a valid WhatsApp number (10 digits, or with country code)." });
+    }
+    if (fields.mapLink === null) {
+      return res.status(400).json({ error: "Map location must be a Google Maps link (https://...) or latitude, longitude (e.g. 18.65, 73.77)." });
+    }
     if (fields.photo === null) {
       return res.status(400).json({ error: "Photo must be a PNG/JPG/WEBP image under about 3 MB." });
     }
@@ -261,7 +300,7 @@ async function main() {
         menu: "",
         photo: "",
         contactNumber: "",
-        whatsappLink: "",
+        whatsappNumber: "",
         mapLink: "",
         openTime: "",
         closeTime: "",
@@ -305,7 +344,15 @@ async function main() {
     );
   });
 
-  // Anyone can rate a mess (1-5, optional short comment); owners see these on their dashboard
+  // Anyone can rate a mess (1-5, optional short comment); owners see these on their dashboard.
+  // Each visitor has an anonymous voterId, so rating again CHANGES their rating instead of adding another.
+  const voterOk = (v) => typeof v === "string" && /^[a-zA-Z0-9-]{8,64}$/.test(v);
+  const summary = (reviews) => {
+    const list = Array.isArray(reviews) ? reviews : [];
+    const total = list.reduce((s, r) => s + Number(r.rating || 0), 0);
+    return { count: list.length, average: list.length ? Math.round((total / list.length) * 10) / 10 : 0 };
+  };
+
   app.post("/api/messes/:key/reviews", reviewLimiter, async (req, res) => {
     const key = cleanKey(req.params.key);
     const rating = Math.round(Number(req.body?.rating));
@@ -313,11 +360,85 @@ async function main() {
       return res.status(400).json({ error: "Please choose a rating from 1 to 5." });
     }
     const comment = clip(req.body?.comment, 500);
-    const result = await messes.updateOne(
-      { _id: key },
-      { $push: { reviews: { $each: [{ rating, comment, createdAt: new Date() }], $slice: -500 } } }
+    const voterId = voterOk(req.body?.voterId) ? req.body.voterId : null;
+
+    let matched = 0;
+    if (voterId) {
+      const r = await messes.updateOne(
+        { _id: key, "reviews.voterId": voterId },
+        { $set: { "reviews.$.rating": rating, "reviews.$.updatedAt": new Date() } }
+      );
+      matched = r.matchedCount;
+    }
+    if (!matched) {
+      const entry = { rating, comment, createdAt: new Date() };
+      if (voterId) entry.voterId = voterId;
+      const r = await messes.updateOne(
+        { _id: key },
+        { $push: { reviews: { $each: [entry], $slice: -500 } } }
+      );
+      if (!r.matchedCount) return res.status(404).json({ error: "Mess not found." });
+    }
+    const doc = await messes.findOne({ _id: key }, { projection: { reviews: 1 } });
+    res.json({ ok: true, ...summary(doc?.reviews) });
+  });
+
+  // Ratings for the built-in messes written in messes.html (they are not in the messes collection).
+  // Stored as { _id: slug, votes: { voterId: rating } } so each visitor counts once.
+  const ratingsCol = database.collection("ratings");
+  const slugOk = (v) => typeof v === "string" && /^[a-z0-9_]{1,80}$/.test(v);
+
+  app.get("/api/ratings", async (_req, res) => {
+    const docs = await ratingsCol.find({}).toArray();
+    const out = {};
+    for (const d of docs) {
+      const votes = Object.values(d.votes || {}).map((n) => Number(n)).filter((n) => n >= 1 && n <= 5);
+      if (!votes.length) continue;
+      out[d._id] = {
+        count: votes.length,
+        average: Math.round((votes.reduce((a, b) => a + b, 0) / votes.length) * 10) / 10
+      };
+    }
+    res.json(out);
+  });
+
+  app.post("/api/ratings/:slug", reviewLimiter, async (req, res) => {
+    const slug = req.params.slug;
+    const rating = Math.round(Number(req.body?.rating));
+    if (!slugOk(slug) || !(rating >= 1 && rating <= 5) || !voterOk(req.body?.voterId)) {
+      return res.status(400).json({ error: "Please choose a rating from 1 to 5." });
+    }
+    await ratingsCol.updateOne(
+      { _id: slug },
+      { $set: { ["votes." + req.body.voterId]: rating } },
+      { upsert: true }
     );
-    if (!result.matchedCount) return res.status(404).json({ error: "Mess not found." });
+    const d = await ratingsCol.findOne({ _id: slug });
+    const votes = Object.values(d?.votes || {}).map(Number);
+    res.json({
+      ok: true,
+      count: votes.length,
+      average: Math.round((votes.reduce((a, b) => a + b, 0) / votes.length) * 10) / 10
+    });
+  });
+
+  // Owner deletes their OWN mess; they must type their password again to confirm.
+  app.post("/api/owner/delete-mess", loginLimiter, async (req, res) => {
+    const user = getUser(req);
+    if (user?.role !== "owner" || !cleanKey(user.key)) {
+      return res.status(401).json({ error: "Please log in again." });
+    }
+    const password = str(req.body?.password).trim();
+    if (!password) return res.status(400).json({ error: "Please enter your password." });
+    const doc = await messes.findOne({ _id: user.key });
+    if (!doc) return res.status(404).json({ error: "Mess not found." });
+    if (!doc.ownerPasswordHash) {
+      return res.status(400).json({ error: "This account has no password set. Please ask the admin to delete it." });
+    }
+    if (!(await bcrypt.compare(password, doc.ownerPasswordHash))) {
+      return res.status(401).json({ error: "Wrong password." });
+    }
+    await messes.deleteOne({ _id: user.key });
     res.json({ ok: true });
   });
 
