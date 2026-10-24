@@ -5,7 +5,7 @@ const path = require("path");
 const fs = require("fs");
 const crypto = require("crypto");
 const express = require("express");
-const { MongoClient } = require("mongodb");
+const { MongoClient, ObjectId } = require("mongodb");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const rateLimit = require("express-rate-limit");
@@ -153,6 +153,11 @@ const registerLimiter = rateLimit({
   skip: (req) => !!getUser(req), // only anonymous sign-ups are limited; logged-in owners/admin are not
   message: { error: "Too many registrations from this connection." }
 });
+const siteReviewLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  limit: 5,
+  message: { error: "Too many reviews from this connection. Try again later." }
+});
 const reviewLimiter = rateLimit({
   windowMs: 60 * 60 * 1000,
   limit: 30,
@@ -168,6 +173,7 @@ async function main() {
   const messes = database.collection("messes");
   const contacts = database.collection("contacts");
   const suggestions = database.collection("suggestions");
+  const siteReviews = database.collection("siteReviews");
 
   app.get("/healthz", (_req, res) => res.json({ ok: true }));
 
@@ -312,6 +318,78 @@ async function main() {
       { $push: { reviews: { $each: [{ rating, comment, createdAt: new Date() }], $slice: -500 } } }
     );
     if (!result.matchedCount) return res.status(404).json({ error: "Mess not found." });
+    res.json({ ok: true });
+  });
+
+  // ----- admin inbox: suggestions and contact messages (newest first) -----
+  const adminOnly = (req, res) => {
+    if (getUser(req)?.role !== "admin") {
+      res.status(401).json({ error: "Admin login required." });
+      return false;
+    }
+    return true;
+  };
+
+  app.get("/api/admin/suggestions", async (req, res) => {
+    if (!adminOnly(req, res)) return;
+    const docs = await suggestions.find({}).sort({ createdAt: -1 }).limit(300).toArray();
+    res.json(docs.map(({ _id, ...rest }) => ({ id: String(_id), ...rest })));
+  });
+
+  app.get("/api/admin/contacts", async (req, res) => {
+    if (!adminOnly(req, res)) return;
+    const docs = await contacts.find({}).sort({ createdAt: -1 }).limit(300).toArray();
+    res.json(docs.map(({ _id, ...rest }) => ({ id: String(_id), ...rest })));
+  });
+
+  app.delete("/api/admin/suggestions/:id", async (req, res) => {
+    if (!adminOnly(req, res)) return;
+    if (!ObjectId.isValid(req.params.id)) return res.status(400).json({ error: "Invalid request." });
+    await suggestions.deleteOne({ _id: new ObjectId(req.params.id) });
+    res.json({ ok: true });
+  });
+
+  app.delete("/api/admin/contacts/:id", async (req, res) => {
+    if (!adminOnly(req, res)) return;
+    if (!ObjectId.isValid(req.params.id)) return res.status(400).json({ error: "Invalid request." });
+    await contacts.deleteOne({ _id: new ObjectId(req.params.id) });
+    res.json({ ok: true });
+  });
+
+  // ----- student reviews of the website (shown on the home page) -----
+  app.get("/api/site-reviews", async (_req, res) => {
+    const docs = await siteReviews.find({}).sort({ createdAt: -1 }).limit(100).toArray();
+    res.json(docs.map(({ _id, ...rest }) => ({ id: String(_id), ...rest })));
+  });
+
+  app.post("/api/site-reviews", siteReviewLimiter, async (req, res) => {
+    const name = clip(req.body?.name, 60);
+    const rating = Math.round(Number(req.body?.rating));
+    const comment = clip(req.body?.comment, 500);
+    if (!name || !comment || !(rating >= 1 && rating <= 5)) {
+      return res.status(400).json({ error: "Please enter your name, a rating and a short review." });
+    }
+    await siteReviews.insertOne({ name, rating, comment, createdAt: new Date() });
+    res.json({ ok: true });
+  });
+
+  app.delete("/api/admin/site-reviews/:id", async (req, res) => {
+    if (!adminOnly(req, res)) return;
+    if (!ObjectId.isValid(req.params.id)) return res.status(400).json({ error: "Invalid request." });
+    await siteReviews.deleteOne({ _id: new ObjectId(req.params.id) });
+    res.json({ ok: true });
+  });
+
+  // clear every suggestion / every contact message
+  app.delete("/api/admin/suggestions", async (req, res) => {
+    if (!adminOnly(req, res)) return;
+    await suggestions.deleteMany({});
+    res.json({ ok: true });
+  });
+
+  app.delete("/api/admin/contacts", async (req, res) => {
+    if (!adminOnly(req, res)) return;
+    await contacts.deleteMany({});
     res.json({ ok: true });
   });
 

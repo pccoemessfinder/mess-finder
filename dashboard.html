@@ -178,6 +178,18 @@ h2{
 
 <div id="messList"></div>
 
+<h2>💡 Suggestions</h2>
+
+<div id="suggestionList"></div>
+
+<h2>📩 Contact Messages</h2>
+
+<div id="contactList"></div>
+
+<h2>⭐ Student Reviews</h2>
+
+<div id="siteReviewList"></div>
+
 <button class="logout" onclick="logout()">
 🚪 Logout
 </button>
@@ -458,7 +470,125 @@ function logout(){
     window.location.href = "login.html";
 }
 
+// ---------- Suggestions and Contact Us messages ----------
+
+function fmtDate(v){
+    const d = new Date(v);
+    return isNaN(d) ? "" : d.toLocaleString();
+}
+
+async function loadInbox(){
+    try{
+        const suggestions = await api("GET", "/admin/suggestions");
+        const contacts = await api("GET", "/admin/contacts");
+        renderInbox("suggestions", suggestions, "suggestionList", "No suggestions yet.");
+        renderInbox("contacts", contacts, "contactList", "No messages yet.");
+        renderSiteReviews(await api("GET", "/site-reviews"));
+    }catch(err){
+        console.error(err);
+    }
+}
+
+function renderInbox(kind, items, listId, emptyText){
+
+    const box = document.getElementById(listId);
+
+    if(!Array.isArray(items) || items.length === 0){
+        box.innerHTML = "<p>" + emptyText + "</p>";
+        return;
+    }
+
+    let html = `
+<button class="logout" onclick="clearInbox('${kind}')">
+🗑️ Clear All (${items.length})
+</button>
+`;
+
+    items.forEach(item => {
+
+        const text = kind === "contacts" ? item.message : item.suggestion;
+
+        html += `
+<div class="mess-card">
+
+    ${kind === "contacts" ? `
+    <p><b>Name:</b> ${esc(item.name)}</p>
+
+    <p><b>Email:</b> <a href="mailto:${esc(item.email)}">${esc(item.email)}</a></p>
+    ` : ""}
+
+    <p style="white-space:pre-wrap;">${esc(text)}</p>
+
+    <p><small>${esc(fmtDate(item.createdAt))}</small></p>
+
+    <button onclick="deleteInbox('${kind}','${esc(item.id)}')">
+        ❌ Delete
+    </button>
+
+</div>
+`;
+    });
+
+    box.innerHTML = html;
+}
+
+function renderSiteReviews(items){
+
+    const box = document.getElementById("siteReviewList");
+
+    if(!Array.isArray(items) || items.length === 0){
+        box.innerHTML = "<p>No reviews yet.</p>";
+        return;
+    }
+
+    box.innerHTML = items.map(item => `
+<div class="mess-card">
+
+    <p><b>Name:</b> ${esc(item.name)}</p>
+
+    <p>${"⭐".repeat(Math.max(1, Math.min(5, Number(item.rating) || 0)))}</p>
+
+    <p style="white-space:pre-wrap;">${esc(item.comment)}</p>
+
+    <p><small>${esc(fmtDate(item.createdAt))}</small></p>
+
+    <button onclick="deleteInbox('site-reviews','${esc(item.id)}')">
+        ❌ Delete
+    </button>
+
+</div>
+`).join("");
+}
+
+async function deleteInbox(kind, id){
+
+    if(!confirm(kind === "site-reviews" ? "Delete this review?" : "Delete this message?")) return;
+
+    try{
+        await api("DELETE", "/admin/" + kind + "/" + encodeURIComponent(id));
+        await loadInbox();
+    }catch(err){
+        if(err.message !== "Not logged in") alert("Error: " + err.message);
+    }
+}
+
+async function clearInbox(kind){
+
+    const label = kind === "contacts" ? "contact messages" : "suggestions";
+
+    if(!confirm("Delete ALL " + label + "? This cannot be undone.")) return;
+
+    try{
+        await api("DELETE", "/admin/" + kind);
+        await loadInbox();
+    }catch(err){
+        if(err.message !== "Not logged in") alert("Error: " + err.message);
+    }
+}
+
 loadMesses();
+loadInbox();
+setInterval(loadInbox, 30000); // new messages appear without refreshing
 
 </script>
 

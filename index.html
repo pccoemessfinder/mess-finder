@@ -173,32 +173,44 @@ Explore Now
 
     <h2>Student Reviews</h2>
 
-    <div class="college-container">
+    <div class="college-container" id="reviewList"></div>
+
+    <div class="college-container" style="margin-top:20px;">
 
         <div class="college-card">
-            <h3>Rahul</h3>
-            <p>⭐⭐⭐⭐⭐</p>
-            <p>
-                Found a great mess near PCCOE.
-                Very useful website.
-            </p>
-        </div>
+            <h3>✍️ Add Your Review</h3>
 
-        <div class="college-card">
-            <h3>Priya</h3>
-            <p>⭐⭐⭐⭐⭐</p>
-            <p>
-                Easy to find veg messes and
-                contact owners directly.
-            </p>
-        </div>
+            <input
+            type="text"
+            id="reviewName"
+            maxlength="60"
+            placeholder="Your name"
+            style="padding:8px;margin:6px 0;">
 
-        <div class="college-card">
-            <h3>Amit</h3>
-            <p>⭐⭐⭐⭐</p>
-            <p>
-                Weekly menu feature is very helpful.
-            </p>
+            <br>
+
+            <select id="reviewRating" style="padding:8px;margin:6px 0;">
+                <option value="5">⭐⭐⭐⭐⭐</option>
+                <option value="4">⭐⭐⭐⭐</option>
+                <option value="3">⭐⭐⭐</option>
+                <option value="2">⭐⭐</option>
+                <option value="1">⭐</option>
+            </select>
+
+            <br>
+
+            <textarea
+            id="reviewComment"
+            rows="3"
+            maxlength="500"
+            placeholder="Write your review"
+            style="margin:6px 0;"></textarea>
+
+            <br><br>
+
+            <button onclick="submitSiteReview()">
+                Submit Review
+            </button>
         </div>
 
     </div>
@@ -320,6 +332,7 @@ window.onload = function(){
     }
 
     loadStatistics();
+    loadSiteReviews();
 
     // keep the statistics fresh when messes are added/removed elsewhere
     setInterval(loadStatistics, 30000);
@@ -372,6 +385,68 @@ async function loadStatistics(){
     document.getElementById("totalMesses").innerText = total;
     document.getElementById("vegMesses").innerText = veg;
     document.getElementById("nonVegMesses").innerText = nonVeg;
+}
+
+async function loadSiteReviews(){
+
+    const box = document.getElementById("reviewList");
+    if(!box) return;
+
+    try{
+        const res = await fetch("/api/site-reviews");
+        if(!res.ok) throw new Error("Failed");
+        const reviews = await res.json();
+
+        if(!Array.isArray(reviews) || reviews.length === 0){
+            box.innerHTML = "<p style='text-align:center;'>No reviews yet. Be the first to add one!</p>";
+            return;
+        }
+
+        box.innerHTML = reviews.map(r => `
+        <div class="college-card">
+            <h3>${escHtml(r.name)}</h3>
+            <p>${"⭐".repeat(Math.max(1, Math.min(5, Number(r.rating) || 0)))}</p>
+            <p>${escHtml(r.comment)}</p>
+        </div>`).join("");
+
+    }catch(error){
+        console.error("Could not load reviews:", error);
+    }
+}
+
+async function submitSiteReview(){
+
+    const name = document.getElementById("reviewName").value.trim();
+    const rating = document.getElementById("reviewRating").value;
+    const comment = document.getElementById("reviewComment").value.trim();
+
+    if(!name || !comment){
+        alert("Please enter your name and your review.");
+        return;
+    }
+
+    try{
+        const res = await fetch("/api/site-reviews", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name: name, rating: rating, comment: comment })
+        });
+
+        if(!res.ok){
+            const data = await res.json().catch(() => ({}));
+            throw new Error(data.error || "Failed");
+        }
+    }catch(error){
+        alert("Sorry, your review could not be added. " + (error.message && error.message !== "Failed" ? error.message : "Please try again later."));
+        return;
+    }
+
+    document.getElementById("reviewName").value = "";
+    document.getElementById("reviewComment").value = "";
+
+    alert("Thank you! Your review has been added.");
+
+    loadSiteReviews();
 }
 
 async function saveSuggestion(){
