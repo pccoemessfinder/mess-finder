@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PCCOE/DYP Mess Finder</title>
 <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <style>
 .fav-btn{
     display:block;
@@ -40,6 +41,24 @@
 <section>
 
 <h2>Popular Messes Near Colleges</h2>
+
+<!-- Interactive map of all messes -->
+<div class="map-section" id="mess-map">
+    <h3>🗺️ Interactive Map of Messes</h3>
+    <p class="map-legend">Pins color-coded: Green = Veg | Red = Non-Veg | Orange = Veg &amp; Non-Veg</p>
+    <div class="map-bar">
+        <div class="map-tabs">
+            <button type="button" class="active" data-layer="street">Street Map</button>
+            <button type="button" data-layer="osm">OpenStreetMap</button>
+            <button type="button" data-layer="sat">Satellite</button>
+            <button type="button" data-layer="topo">Topographic</button>
+        </div>
+        <button type="button" class="map-near-btn" id="mapNearBtn">🎯 Find Nearest to Me (GPS)</button>
+    </div>
+    <div class="map-box" id="messMap"></div>
+    <p class="map-status" id="mapStatus">Loading map…</p>
+    <div class="map-near-result" id="mapNearest"></div>
+</div>
 
 
 <div class="search-box">
@@ -1901,7 +1920,9 @@ function highlightFromHash(){
 
 window.addEventListener("load", function(){
 
-    loadDatabaseMesses();
+    loadDatabaseMesses().finally(function(){
+        document.dispatchEvent(new Event("messes-ready"));
+    });
     restoreSavedState();
     loadOverallRatings();
     highlightFromHash();
@@ -2120,6 +2141,10 @@ Object.assign(window, {
     showMenuPopup, closeMenuPopup
 });
 </script>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="mess-map.js"></script>
+<script src="extras.js" defer></script>
 
 </body>
 </html>

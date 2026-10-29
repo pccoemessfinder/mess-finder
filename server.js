@@ -197,6 +197,78 @@ const reviewLimiter = rateLimit({
   message: { error: "Too many ratings from this connection. Try again later." }
 });
 
+const visitLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  limit: 30,
+  message: { error: "Too many requests." }
+});
+const resolveLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  limit: 30,
+  message: { error: "Too many requests. Try again later." }
+});
+
+// ---------- map links -> coordinates ----------
+
+// Pull latitude/longitude out of a Google Maps URL (or page text). Returns {lat,lng} or null.
+function coordsFromText(t) {
+  const s = str(t);
+  const pats = [
+    /!3d(-?\d{1,2}(?:\.\d+)?)!4d(-?\d{1,3}(?:\.\d+)?)/,
+    /@(-?\d{1,2}(?:\.\d+)?),(-?\d{1,3}(?:\.\d+)?)/,
+    /[?&](?:q|ll|query|destination|center)=(-?\d{1,2}(?:\.\d+)?)(?:,|%2C)(-?\d{1,3}(?:\.\d+)?)/i
+  ];
+  for (const p of pats) {
+    const m = s.match(p);
+    if (m) {
+      const lat = Number(m[1]);
+      const lng = Number(m[2]);
+      if (Math.abs(lat) <= 90 && Math.abs(lng) <= 180) return { lat, lng };
+    }
+  }
+  return null;
+}
+
+// Only Google Maps hosts are ever fetched (so this cannot be used to reach other servers)
+function isGoogleMapsUrl(u) {
+  try {
+    const x = new URL(u);
+    if (x.protocol !== "https:") return false;
+    const h = x.hostname.toLowerCase();
+    if (h === "maps.app.goo.gl") return true;
+    if (h === "goo.gl" || h === "www.goo.gl") return x.pathname.startsWith("/maps");
+    if (h === "maps.google.com") return true;
+    return (h === "google.com" || h === "www.google.com") && x.pathname.startsWith("/maps");
+  } catch {
+    return false;
+  }
+}
+
+// Follow short links like https://maps.app.goo.gl/xxxx to find the coordinates
+async function resolveMapUrl(url) {
+  let direct = coordsFromText(url);
+  if (direct) return direct;
+  let current = url;
+  for (let i = 0; i < 6; i++) {
+    if (!isGoogleMapsUrl(current)) return null;
+    const r = await fetch(current, {
+      redirect: "manual",
+      headers: { "User-Agent": "Mozilla/5.0 (compatible; MessFinder/1.0)" },
+      signal: AbortSignal.timeout(8000)
+    });
+    const loc = r.headers.get("location");
+    if (loc) {
+      current = new URL(loc, current).toString();
+      const c = coordsFromText(current);
+      if (c) return c;
+      continue;
+    }
+    const body = (await r.text()).slice(0, 400000);
+    return coordsFromText(body);
+  }
+  return null;
+}
+
 // ---------- start ----------
 
 async function main() {
@@ -420,6 +492,57 @@ async function main() {
       count: votes.length,
       average: Math.round((votes.reduce((a, b) => a + b, 0) / votes.length) * 10) / 10
     });
+  });
+
+  // ----- visitor counter: total unique visitors + how many are on the site right now -----
+  const visitors = database.collection("visitors");
+
+  app.post("/api/visit", visitLimiter, async (req, res) => {
+    const id = req.body?.visitorId;
+    if (typeof id !== "string" || !/^[a-zA-Z0-9-]{8,64}$/.test(id)) {
+      return res.status(400).json({ error: "Invalid request." });
+    }
+    const now = new Date();
+    await visitors.updateOne(
+      { _id: id },
+      { $set: { lastSeen: now }, $setOnInsert: { firstSeen: now } },
+      { upsert: true }
+    );
+    res.json({ ok: true });
+  });
+
+  app.get("/api/stats", async (_req, res) => {
+    const total = await visitors.countDocuments({});
+    const active = await visitors.countDocuments({ lastSeen: { $gte: new Date(Date.now() - 90 * 1000) } });
+    res.set("Cache-Control", "no-store");
+    res.json({ total, active });
+  });
+
+  // ----- map pins: turn Google Maps links into coordinates (results are cached) -----
+  const mapCache = database.collection("mapcache");
+
+  app.post("/api/resolve-map", resolveLimiter, async (req, res) => {
+    const urls = Array.isArray(req.body?.urls) ? req.body.urls.slice(0, 40) : [];
+    const out = {};
+    for (const raw of urls) {
+      const url = clip(raw, 2000);
+      if (!url || out[url]) continue;
+      const direct = coordsFromText(url);
+      if (direct) { out[url] = direct; continue; }
+      if (!isGoogleMapsUrl(url)) continue;
+      const cached = await mapCache.findOne({ _id: url });
+      if (cached) { out[url] = { lat: cached.lat, lng: cached.lng }; continue; }
+      try {
+        const c = await resolveMapUrl(url);
+        if (c) {
+          out[url] = c;
+          await mapCache.updateOne({ _id: url }, { $set: { ...c, at: new Date() } }, { upsert: true });
+        }
+      } catch (err) {
+        console.error("resolve-map failed:", err.message);
+      }
+    }
+    res.json(out);
   });
 
   // Owner deletes their OWN mess; they must type their password again to confirm.

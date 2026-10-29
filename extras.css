@@ -1,0 +1,171 @@
+/* New features only (visitor counter, Website Guide, map). Existing styles are not touched. */
+
+/* ---- Visitor counter ---- */
+.visitor-pill{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:7px 14px;
+    border-radius:25px;
+    background:rgba(255,255,255,0.12);
+    border:1px solid rgba(255,255,255,0.25);
+    color:#e0e7ff;
+    font-size:14px;
+    font-weight:600;
+    white-space:nowrap;
+}
+.visitor-pill .v-live{
+    width:9px;height:9px;border-radius:50%;
+    background:#22c55e;
+    box-shadow:0 0 0 0 rgba(34,197,94,.6);
+    animation:vpulse 2s infinite;
+}
+.visitor-pill .v-active{
+    display:inline-flex;align-items:center;gap:5px;
+    padding:2px 9px;border-radius:20px;
+    background:rgba(34,197,94,.18);
+    color:#86efac;font-size:12px;
+}
+.visitor-pill .v-active i{
+    width:7px;height:7px;border-radius:50%;background:#22c55e;display:inline-block;
+}
+@keyframes vpulse{
+    0%{box-shadow:0 0 0 0 rgba(34,197,94,.6)}
+    70%{box-shadow:0 0 0 8px rgba(34,197,94,0)}
+    100%{box-shadow:0 0 0 0 rgba(34,197,94,0)}
+}
+.light-mode .visitor-pill{background:#eef2ff;border-color:#c7d2fe;color:#4338ca}
+.light-mode .visitor-pill .v-active{color:#15803d}
+
+/* ---- Website Guide button + window ---- */
+.guide-btn{
+    padding:9px 16px;
+    border:none;
+    border-radius:25px;
+    background:#fde68a;
+    color:#92400e;
+    font-weight:700;
+    cursor:pointer;
+    font-size:14px;
+    white-space:nowrap;
+}
+.guide-btn:hover{background:#fcd34d}
+
+.mf-modal{
+    display:none;
+    position:fixed;inset:0;
+    background:rgba(0,0,0,0.7);
+    z-index:10000;
+    overflow:auto;
+}
+.mf-modal.open{display:block}
+.mf-modal-box{
+    background:#1e293b;
+    color:white;
+    width:90%;max-width:760px;
+    margin:40px auto;
+    padding:22px;
+    border-radius:15px;
+    max-height:85vh;
+    overflow-y:auto;
+    text-align:left;
+}
+.mf-modal-box h2{margin:0 0 6px;font-size:26px;text-align:left}
+.mf-modal-box .mf-sub{margin:0 0 16px;color:#cbd5e1}
+.mf-close{float:right;font-size:30px;cursor:pointer;line-height:1;background:none;border:none;color:white;padding:0;margin:0}
+.mf-close:hover{color:#f87171}
+.guide-item{
+    background:#334155;
+    border-radius:12px;
+    padding:14px 16px;
+    margin:10px 0;
+    display:flex;gap:12px;align-items:flex-start;justify-content:space-between;
+}
+.guide-item h4{margin:0 0 4px;font-size:17px}
+.guide-item p{margin:0;color:#e2e8f0;font-size:15px;line-height:1.45}
+.guide-item a.guide-try{
+    flex-shrink:0;
+    background:#38bdf8;color:white;text-decoration:none;
+    padding:7px 16px;border-radius:20px;font-weight:600;font-size:14px;
+}
+.guide-item a.guide-try:hover{background:#0ea5e9}
+.light-mode .mf-modal-box{background:white;color:#111827}
+.light-mode .mf-modal-box .mf-sub,.light-mode .guide-item p{color:#374151}
+.light-mode .guide-item{background:#f1f5f9}
+.light-mode .mf-close{color:#111827}
+
+/* ---- Interactive map ---- */
+.map-section{
+    max-width:900px;
+    margin:0 auto 40px;
+    background:rgba(255,255,255,0.1);
+    border:1px solid rgba(255,255,255,0.2);
+    border-radius:20px;
+    padding:22px;
+    backdrop-filter:blur(12px);
+    text-align:left;
+}
+.map-section h3{font-size:26px;margin-bottom:6px}
+.map-section .map-legend{margin:0 0 14px;color:#cbd5e1;font-size:14px}
+.map-bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:14px}
+.map-tabs{display:inline-flex;gap:4px;padding:5px;border-radius:25px;background:rgba(255,255,255,0.12)}
+.map-tabs button{
+    border:none;background:transparent;color:inherit;
+    padding:8px 14px;border-radius:20px;cursor:pointer;font-weight:600;font-size:14px;
+}
+.map-tabs button.active{background:#38bdf8;color:white}
+.map-near-btn{
+    border:none;background:#10b981;color:white;font-weight:700;
+    padding:10px 18px;border-radius:25px;cursor:pointer;font-size:14px;
+}
+.map-near-btn:hover{background:#059669}
+.map-box{height:460px;border-radius:15px;overflow:hidden;position:relative;z-index:0}
+.map-near-result{margin-top:12px;font-size:15px}
+.map-near-result button{
+    background:none;border:none;color:#38bdf8;cursor:pointer;font-weight:700;padding:0;font-size:15px;text-decoration:underline;
+}
+.map-status{margin:8px 0 0;color:#cbd5e1;font-size:13px}
+
+/* The site-wide  img{height:520px; margin:20px auto; ...}  rule would break map tiles */
+.map-box img,.map-box .leaflet-tile{
+    margin:0 !important;
+    border-radius:0 !important;
+    object-fit:fill !important;
+    max-width:none !important;
+}
+.map-box .leaflet-tile{height:auto}
+
+.mess-pin{background:none;border:none}
+.mess-pin span{
+    display:block;width:26px;height:26px;
+    border-radius:50% 50% 50% 0;
+    transform:rotate(-45deg);
+    border:3px solid white;
+    box-shadow:0 3px 8px rgba(0,0,0,.45);
+}
+.mess-pin .pin-veg{background:#16a34a}
+.mess-pin .pin-nonveg{background:#dc2626}
+.mess-pin .pin-both{background:#f59e0b}
+.mess-pin .pin-other{background:#64748b}
+.me-pin{background:none;border:none}
+.me-pin span{
+    display:block;width:18px;height:18px;border-radius:50%;
+    background:#2563eb;border:3px solid white;box-shadow:0 0 0 6px rgba(37,99,235,.25);
+}
+.map-pop{color:#111827;min-width:170px;text-align:left}
+.map-pop b{font-size:15px}
+.map-pop div{margin:3px 0;font-size:13px}
+.map-pop .map-pop-btns{display:flex;gap:6px;margin-top:8px}
+.map-pop button,.map-pop a{
+    flex:1;text-align:center;text-decoration:none;
+    background:#38bdf8;color:white;border:none;border-radius:15px;
+    padding:6px 8px;font-size:12px;font-weight:700;cursor:pointer;
+}
+.light-mode .map-section{background:white;border-color:#ddd}
+.light-mode .map-section .map-legend,.light-mode .map-status{color:#4b5563}
+.light-mode .map-tabs{background:#e5e7eb}
+
+@media(max-width:768px){
+    .map-box{height:360px}
+    .guide-item{flex-direction:column}
+}

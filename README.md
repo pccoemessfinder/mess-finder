@@ -60,6 +60,12 @@ npm start               # http://localhost:3000
   (Atlas -> Browse Collections).
 - Passwords are stored hashed (bcrypt). Photos are stored in the database (resized by the owner dashboard).
 
+- **Interactive map** (top of `messes.html`): one pin per mess (green Veg, red Non-Veg, orange both), 4 map styles,
+  "Find Nearest to Me". Pins come from each mess's Google Maps link; short `maps.app.goo.gl` links are resolved by the
+  server (`/api/resolve-map`) and cached in the `mapcache` collection.
+- **Website Guide** button and **visitor counter** (total unique visitors + "active" in the last 90 s) appear in the
+  navbar via `extras.js` / `extras.css`; visitors are stored in the `visitors` collection.
+
 ## Known limitation
 The original 15 messes (Patil, Morya, Vaishnavi, ...) are written directly into `messes.html` with their
 own photos and weekly-menu pop-ups. They are NOT in MongoDB, so the admin dashboard cannot edit or delete
