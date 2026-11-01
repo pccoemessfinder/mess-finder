@@ -1,4 +1,4 @@
-# PCCOE/DYP Mess Finder
+# Bhojan Setu
 
 Website (`public/`) + API (`server.js`) + MongoDB Atlas. **One Render web service serves both**, so the
 website must be opened from the Render URL (GitHub Pages alone cannot run the API).

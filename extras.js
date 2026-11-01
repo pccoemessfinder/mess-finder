@@ -31,7 +31,7 @@
     ["⭐", "Your Rating vs Overall Rating", "Pick 1–5 stars and press Submit Rating. “Your Rating” is your own score (you can change it later); “Overall Rating” is the average of everyone's ratings.", "messes.html", "Try"],
     ["📋", "Weekly Menu & Contact", "Every card has a Weekly Menu pop-up, a Location button for Google Maps and a WhatsApp button to chat with the mess.", "messes.html", "Try"],
     ["🏪", "Mess Owners", "Owners can register, then log in to edit the menu, photo, timings, WhatsApp number and map location — or delete their mess with their password.", "owner-login.html", "Open"],
-    ["💬", "Contact & Suggestions", "Send us a message or a suggestion to improve Mess Finder.", "contact.html", "Open"],
+    ["💬", "Contact & Suggestions", "Send us a message or a suggestion to improve Bhojan Setu.", "contact.html", "Open"],
     ["🌙", "Dark Mode & Languages", "On the home page, switch between dark and light mode and choose English, मराठी or हिन्दी.", "index.html", "Open"]
   ];
 
@@ -53,7 +53,7 @@
     box.appendChild(h);
     var sub = document.createElement("p");
     sub.className = "mf-sub";
-    sub.textContent = "Everything you can do on PCCOE/DYP Mess Finder.";
+    sub.textContent = "Everything you can do on Bhojan Setu.";
     box.appendChild(sub);
 
     GUIDE.forEach(function (g) {

@@ -137,9 +137,9 @@ function pickFields(body) {
 
 // ---------- email notifications (contact form + suggestions) ----------
 // Uses Resend's web API (Render's free plan blocks normal SMTP/Gmail ports).
-// Needs RESEND_API_KEY in Render's Environment tab. MAIL_TO defaults to the Mess Finder inbox.
+// Needs RESEND_API_KEY in Render's Environment tab. MAIL_TO defaults to the Bhojan Setu inbox.
 const MAIL_TO = process.env.MAIL_TO || "messfinderpccoe@gmail.com";
-const MAIL_FROM = process.env.MAIL_FROM || "Mess Finder <onboarding@resend.dev>";
+const MAIL_FROM = process.env.MAIL_FROM || "Bhojan Setu <onboarding@resend.dev>";
 
 function sendMail(subject, text, replyTo) {
   const apiKey = process.env.RESEND_API_KEY;
@@ -657,7 +657,7 @@ async function main() {
     }
     await contacts.insertOne({ name, email, message, createdAt: new Date() });
     sendMail(
-      "Mess Finder - new contact message from " + name,
+      "Bhojan Setu - new contact message from " + name,
       "Name: " + name + "\nEmail: " + email + "\n\nMessage:\n" + message,
       email
     );
@@ -668,7 +668,7 @@ async function main() {
     const suggestion = clip(req.body?.suggestion, 3000);
     if (!suggestion) return res.status(400).json({ error: "Please write your suggestion." });
     await suggestions.insertOne({ suggestion, createdAt: new Date() });
-    sendMail("Mess Finder - new suggestion", "New suggestion:\n\n" + suggestion);
+    sendMail("Bhojan Setu - new suggestion", "New suggestion:\n\n" + suggestion);
     res.json({ ok: true });
   });
 
@@ -696,7 +696,7 @@ async function main() {
     res.status(err.status || 500).json({ error: err.status === 413 ? "Photo is too large." : "Server error" });
   });
 
-  app.listen(PORT, () => console.log("Mess Finder running on port " + PORT));
+  app.listen(PORT, () => console.log("Bhojan Setu running on port " + PORT));
 }
 
 main().catch((err) => {

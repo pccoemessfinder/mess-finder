@@ -1,7 +1,7 @@
 {
   "name": "mess-finder",
   "version": "1.0.0",
-  "description": "PCCOE/DYP Mess Finder - website + API (Express, MongoDB)",
+  "description": "Bhojan Setu - website + API (Express, MongoDB)",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
