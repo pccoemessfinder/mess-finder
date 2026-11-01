@@ -188,7 +188,7 @@ const registerLimiter = rateLimit({
 });
 const siteReviewLimiter = rateLimit({
   windowMs: 60 * 60 * 1000,
-  limit: 5,
+  limit: 25,
   message: { error: "Too many reviews from this connection. Try again later." }
 });
 const reviewLimiter = rateLimit({
@@ -735,6 +735,11 @@ async function main() {
 
   app.listen(PORT, () => console.log("Bhojan Setu running on port " + PORT));
 }
+
+main().catch((err) => {
+  console.error("Failed to start:", err);
+  process.exit(1);
+});
 
 main().catch((err) => {
   console.error("Failed to start:", err);
