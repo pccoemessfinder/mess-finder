@@ -165,7 +165,27 @@
 .light-mode .map-section .map-legend,.light-mode .map-status{color:#4b5563}
 .light-mode .map-tabs{background:#e5e7eb}
 
+/* Keep the map card inside the screen */
+#mapSection{min-width:0}
+.map-section{width:100%;min-width:0}
+.map-bar{min-width:0}
+.map-tabs button{white-space:nowrap}
+
 @media(max-width:768px){
+    #mapSection{padding:30px 12px}
+    .map-section{padding:16px 14px;margin-bottom:24px}
+    .map-section h3{font-size:22px}
+    .map-bar{flex-direction:column;align-items:stretch;gap:10px}
+    /* 2 x 2 grid instead of one long row that runs off the screen */
+    .map-tabs{
+        display:grid;grid-template-columns:1fr 1fr;gap:6px;
+        border-radius:18px;width:100%;
+    }
+    .map-tabs button{
+        padding:10px 6px;font-size:13px;text-align:center;
+        white-space:normal;line-height:1.2;
+    }
+    .map-near-btn{width:100%;padding:12px 14px}
     .map-box{height:360px}
     .guide-item{flex-direction:column}
 }
