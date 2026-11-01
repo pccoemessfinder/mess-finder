@@ -320,6 +320,25 @@ async function seedMesses(database, messes) {
   console.log("Seeded " + added + " messes into the owner accounts.");
 }
 
+// ---------- one-time clean-up: the monthly price ("Rs 3000 / Month") is removed from every mess ----------
+// A price can hold several parts separated by "|" (e.g. monthly plan | per meal). Only the monthly part goes.
+async function removeMonthlyPrices(database, messes) {
+  const meta = database.collection("meta");
+  if (await meta.findOne({ _id: "remove_monthly_price_v1" })) return;
+
+  let changed = 0;
+  for (const m of await messes.find({}, { projection: { price: 1 } }).toArray()) {
+    const before = str(m.price);
+    const after = before.split("|").map((p) => p.trim()).filter((p) => p && !/month/i.test(p)).join(" | ");
+    if (after !== before) {
+      await messes.updateOne({ _id: m._id }, { $set: { price: after } });
+      changed++;
+    }
+  }
+  await meta.updateOne({ _id: "remove_monthly_price_v1" }, { $set: { at: new Date(), changed } }, { upsert: true });
+  console.log("Removed the monthly price from " + changed + " messes.");
+}
+
 // ---------- start ----------
 
 async function main() {
@@ -334,6 +353,7 @@ async function main() {
   // "Today's Special" was removed from the website: clean it out of old records too
   await messes.updateMany({ todaySpecial: { $exists: true } }, { $unset: { todaySpecial: "" } });
   await seedMesses(database, messes);
+  await removeMonthlyPrices(database, messes);
 
   app.get("/healthz", (_req, res) => res.json({ ok: true }));
 
@@ -700,7 +720,7 @@ async function main() {
     app.use((req, res, next) => {
       let p = "/";
       try { p = decodeURIComponent(req.path); } catch (e) { /* ignore */ }
-      if (p === "/" || p.toLowerCase() === "/db.js" || siteFile.test(p)) return next();
+      if (p === "/" || /^\/(db|extras|mess-map)\.js$/i.test(p) || siteFile.test(p)) return next();
       res.status(404).send("Not found");
     });
   }

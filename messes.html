@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Bhojan Setu</title>
 <link rel="stylesheet" href="style.css">
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <style>
 .fav-btn{
     display:block;
@@ -70,13 +69,7 @@
     <button onclick="filterMess('veg')">🟢 Veg</button>
     <button onclick="filterMess('nonveg')">🔴 Non-Veg</button>
 </div>
-<div style="text-align:center; margin:20px 0;">
-    <button onclick="findLocation()" class="btn">
-        📍 Find Mess Near Me
-    </button>
-</div>
 
-<p id="locationResult"></p>
 <div class="college-container">
 <div id="dynamicMesses" style="display:contents"></div>
 </div>
@@ -280,54 +273,6 @@ function toggleFavorite(element){
     );
 }
 
-function findLocation() {
-
-    if (navigator.geolocation) {
-
-        navigator.geolocation.getCurrentPosition(function(position) {
-
-            let lat = position.coords.latitude;
-            let lng = position.coords.longitude;
-
-            window.open(
-                "https://www.google.com/maps/search/mess/@"
-                + lat + "," + lng + ",15z",
-                "_blank"
-            );
-
-        }, showError);
-
-    } else {
-
-        alert("Geolocation not supported");
-
-    }
-
-}
-
-
-function showPosition(position){
-
-    document.getElementById(
-        "locationResult"
-    ).innerHTML =
-    "✅ Location Detected Successfully";
-
-    window.open(
-        "https://www.google.com/maps/search/mess+near+me",
-        "_blank"
-    );
-
-}
-
-function showError(){
-
-    document.getElementById(
-        "locationResult"
-    ).innerHTML =
-    "Location access denied.";
-
-}
 function loadOwnerMesses(){
 
 
@@ -612,13 +557,12 @@ console.error("Could not load messes:", error);
 // This script is a module, so functions used by onclick="..." in the HTML
 // must be attached to window (they were not, so those buttons did nothing)
 Object.assign(window, {
-    searchMess, filterMess, toggleFavorite, findLocation,
+    searchMess, filterMess, toggleFavorite,
     showMenuPopup, closeMenuPopup
 });
 </script>
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="mess-map.js"></script>
+<script src="mess-map.js" defer></script>
 <script src="extras.js" defer></script>
 
 </body>

@@ -59,7 +59,7 @@ npm start               # http://localhost:3000
   (Atlas -> Browse Collections).
 - Passwords are stored hashed (bcrypt). Photos are stored in the database (resized by the owner dashboard).
 
-- **Interactive map** (top of `messes.html`): one pin per mess (green Veg, red Non-Veg, orange both), 4 map styles,
+- **Interactive map** (on the home page `index.html` and at the top of `messes.html`): one pin per mess (green Veg, red Non-Veg, orange both), 4 map styles,
   "Find Nearest to Me". Pins come from each mess's Google Maps link; short `maps.app.goo.gl` links are resolved by the
   server (`/api/resolve-map`) and cached in the `mapcache` collection.
 - **Website Guide** button and **visitor counter** (total unique visitors + "active" in the last 90 s) appear in the
@@ -97,3 +97,13 @@ password for any owner in the admin dashboard (edit the mess and type a new pass
   built-in cards were copied into the messes on the first start, so nothing is lost.
 - **Today's Special** was removed everywhere (site, API, and old records).
 - Photos of the 16 messes stay as files in `public/` (e.g. `morya.jpg`); owners can upload a new photo any time.
+
+## Latest changes
+- The **monthly price** is removed from every mess (cards, dashboards, database). A one-time clean-up runs on the
+  first start and removes it from messes that were already saved. Per-meal prices stay.
+- The **interactive map**, **visitor counter** (total + active now) and **Website Guide** are on the home page and the
+  messes page. The map reads the messes from the database and loads its map library with backup sources.
+- The "Find Mess Near Me" button was removed from `messes.html` (the map's "Find Nearest to Me (GPS)" stays).
+- If the files are uploaded flat (no `public/` folder), the server now still serves `extras.js` and `mess-map.js`
+  (before, they were blocked, so the map, visitor counter and guide did not appear). The correct layout is still
+  `server.js` + `seed-messes.json` + `public/` side by side.

@@ -226,7 +226,7 @@ function loadData(){
 document.getElementById("messInfo").innerHTML = `
 <h2>${esc(ownerMess.name)}</h2>
 <p><b>Location:</b> ${esc(ownerMess.location)}</p>
-<p><b>Price:</b> ${esc(ownerMess.price)}</p>
+${ownerMess.price ? `<p><b>Price:</b> ${esc(ownerMess.price)}</p>` : ""}
 <p><b>Type:</b> ${esc(ownerMess.type)}</p>
 `;
 

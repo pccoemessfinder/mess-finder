@@ -25,11 +25,10 @@
   // ---------- Website Guide ----------
   var GUIDE = [
     ["🔍", "Search & Filter", "Type a mess name in the search box, or use All / Veg / Non-Veg to narrow the list.", "messes.html", "Try"],
-    ["🗺️", "Interactive Map", "See every mess as a pin: green = Veg, red = Non-Veg, orange = both. Switch the map style, tap a pin for details, or press “Find Nearest to Me”.", "messes.html#mess-map", "Try"],
-    ["📍", "Find Mess Near Me", "Uses your GPS and opens Google Maps with messes near you.", "messes.html", "Try"],
+    ["🗺️", "Interactive Map", "See every mess as a pin: green = Veg, red = Non-Veg, orange = both. Switch the map style, tap a pin for details, or press “Find Nearest to Me”.", "index.html#mess-map", "Try"],
     ["❤️", "Favorites", "Tap “Add to Favorite” on a mess. Open ❤️ Favorites on the home page to see them all.", "index.html", "Open"],
-    ["⭐", "Your Rating vs Overall Rating", "Pick 1–5 stars and press Submit Rating. “Your Rating” is your own score (you can change it later); “Overall Rating” is the average of everyone's ratings.", "messes.html", "Try"],
-    ["📋", "Weekly Menu & Contact", "Every card has a Weekly Menu pop-up, a Location button for Google Maps and a WhatsApp button to chat with the mess.", "messes.html", "Try"],
+    ["⭐", "Overall Rating", "Pick 1–5 stars and press Submit Rating. The Overall Rating is the average of everyone's ratings (you can change your own rating later).", "messes.html", "Try"],
+    ["📋", "Weekly Menu & Contact", "Every card has a Weekly Menu pop-up, a Real Location button for Google Maps and a WhatsApp button to chat with the mess.", "messes.html", "Try"],
     ["🏪", "Mess Owners", "Owners can register, then log in to edit the menu, photo, timings, WhatsApp number and map location — or delete their mess with their password.", "owner-login.html", "Open"],
     ["💬", "Contact & Suggestions", "Send us a message or a suggestion to improve Bhojan Setu.", "contact.html", "Open"],
     ["🌙", "Dark Mode & Languages", "On the home page, switch between dark and light mode and choose English, मराठी or हिन्दी.", "index.html", "Open"]
