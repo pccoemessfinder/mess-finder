@@ -46,6 +46,7 @@ function safePhoto(v) {
   if (!s) return "";
   if (/^data:image\/(png|jpe?g|webp|gif);base64,/i.test(s) && s.length <= 4_000_000) return s;
   if (/^https?:\/\//i.test(s) && s.length <= 2000) return s;
+  if (/^[a-z0-9_\-]{1,80}\.(jpe?g|png|webp|gif)$/i.test(s)) return s; // image file stored in /public
   return null; // invalid
 }
 
@@ -125,7 +126,6 @@ function pickFields(body) {
   if ("price" in body) out.price = clip(body.price, 60);
   if ("type" in body) out.type = clip(body.type, 30);
   if ("menu" in body) out.menu = clip(body.menu, 5000);
-  if ("todaySpecial" in body) out.todaySpecial = clip(body.todaySpecial, 500);
   if ("contactNumber" in body) out.contactNumber = clip(body.contactNumber, 30);
   if ("openTime" in body) out.openTime = clip(body.openTime, 20);
   if ("closeTime" in body) out.closeTime = clip(body.closeTime, 20);
@@ -269,6 +269,57 @@ async function resolveMapUrl(url) {
   return null;
 }
 
+// ---------- one-time seed: the 16 original messes become normal owner accounts ----------
+// Each mess gets a login (email = mess name @messfinder.com, password 123456). It runs only once
+// (flag stored in the "meta" collection), so a mess an owner/admin later deletes never comes back.
+async function seedMesses(database, messes) {
+  const meta = database.collection("meta");
+  if (await meta.findOne({ _id: "seed_messes_v1" })) return;
+
+  const list = JSON.parse(fs.readFileSync(path.join(__dirname, "seed-messes.json"), "utf8"));
+  const ratingsCol = database.collection("ratings"); // old visitor ratings of the built-in cards
+  const passwordHash = await bcrypt.hash("123456", 10);
+  const base = Date.now() - list.length * 1000;
+  let added = 0;
+
+  for (let i = 0; i < list.length; i++) {
+    const m = list[i];
+    const email = m.ownerEmail.toLowerCase();
+    const key = emailToKey(email);
+    if (await messes.findOne({ _id: key })) continue;
+
+    // carry over what visitors already rated, so no rating is lost
+    const slug = String(m.legacyRatingName || m.name).toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "");
+    const old = await ratingsCol.findOne({ _id: slug });
+    const reviews = Object.entries(old?.votes || {})
+      .filter(([, n]) => Number(n) >= 1 && Number(n) <= 5)
+      .map(([voterId, n]) => ({ rating: Number(n), comment: "", voterId, createdAt: new Date(base + i * 1000) }));
+
+    await messes.insertOne({
+      _id: key,
+      name: m.name,
+      location: m.location || "",
+      price: m.price || "",
+      type: m.type || "",
+      menu: m.menu || "",
+      photo: m.photo || "",
+      contactNumber: m.contactNumber || "",
+      whatsappNumber: m.whatsappNumber || "",
+      mapLink: m.mapLink || "",
+      openTime: m.openTime || "",
+      closeTime: m.closeTime || "",
+      reviews,
+      ownerEmail: email,
+      ownerPasswordHash: passwordHash,
+      createdAt: new Date(base + i * 1000)
+    });
+    added++;
+  }
+
+  await meta.updateOne({ _id: "seed_messes_v1" }, { $set: { at: new Date(), added } }, { upsert: true });
+  console.log("Seeded " + added + " messes into the owner accounts.");
+}
+
 // ---------- start ----------
 
 async function main() {
@@ -279,6 +330,10 @@ async function main() {
   const contacts = database.collection("contacts");
   const suggestions = database.collection("suggestions");
   const siteReviews = database.collection("siteReviews");
+
+  // "Today's Special" was removed from the website: clean it out of old records too
+  await messes.updateMany({ todaySpecial: { $exists: true } }, { $unset: { todaySpecial: "" } });
+  await seedMesses(database, messes);
 
   app.get("/healthz", (_req, res) => res.json({ ok: true }));
 
@@ -315,6 +370,7 @@ async function main() {
   app.get("/api/messes", async (req, res) => {
     const docs = await messes
       .find({}, req.query.basic ? { projection: { photo: 0, menu: 0, reviews: 0 } } : {})
+      .sort({ createdAt: 1 })
       .toArray();
     const out = {};
     for (const d of docs) out[d._id] = publicMess(d);
@@ -453,45 +509,6 @@ async function main() {
     }
     const doc = await messes.findOne({ _id: key }, { projection: { reviews: 1 } });
     res.json({ ok: true, ...summary(doc?.reviews) });
-  });
-
-  // Ratings for the built-in messes written in messes.html (they are not in the messes collection).
-  // Stored as { _id: slug, votes: { voterId: rating } } so each visitor counts once.
-  const ratingsCol = database.collection("ratings");
-  const slugOk = (v) => typeof v === "string" && /^[a-z0-9_]{1,80}$/.test(v);
-
-  app.get("/api/ratings", async (_req, res) => {
-    const docs = await ratingsCol.find({}).toArray();
-    const out = {};
-    for (const d of docs) {
-      const votes = Object.values(d.votes || {}).map((n) => Number(n)).filter((n) => n >= 1 && n <= 5);
-      if (!votes.length) continue;
-      out[d._id] = {
-        count: votes.length,
-        average: Math.round((votes.reduce((a, b) => a + b, 0) / votes.length) * 10) / 10
-      };
-    }
-    res.json(out);
-  });
-
-  app.post("/api/ratings/:slug", reviewLimiter, async (req, res) => {
-    const slug = req.params.slug;
-    const rating = Math.round(Number(req.body?.rating));
-    if (!slugOk(slug) || !(rating >= 1 && rating <= 5) || !voterOk(req.body?.voterId)) {
-      return res.status(400).json({ error: "Please choose a rating from 1 to 5." });
-    }
-    await ratingsCol.updateOne(
-      { _id: slug },
-      { $set: { ["votes." + req.body.voterId]: rating } },
-      { upsert: true }
-    );
-    const d = await ratingsCol.findOne({ _id: slug });
-    const votes = Object.values(d?.votes || {}).map(Number);
-    res.json({
-      ok: true,
-      count: votes.length,
-      average: Math.round((votes.reduce((a, b) => a + b, 0) / votes.length) * 10) / 10
-    });
   });
 
   // ----- visitor counter: total unique visitors + how many are on the site right now -----

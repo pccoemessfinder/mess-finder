@@ -52,10 +52,9 @@ npm start               # http://localhost:3000
   so it cannot be changed after adding. Leave the password blank when editing to keep the current one.
 - **Owners** (`owner-login.html` -> `owner-dashboard.html`): can register themselves, then edit menu, photo,
   contact number, WhatsApp number, Google Maps link (or latitude, longitude) and timings. They can also delete their own mess (asks for their password).
-- **Visitors**: `messes.html` shows the messes stored in MongoDB (under the built-in cards) and can rate
-  them. Every card shows **Your Rating** (this visitor's own) and **Overall Rating** (average of everyone's).
-  One visitor = one rating per mess; rating again changes it. Ratings are stored in the mess's `reviews` list
-  (built-in messes: `ratings` collection) and appear on the owner and admin dashboards.
+- **Visitors**: `messes.html` shows every mess stored in MongoDB and can rate them. Every card shows the
+  **Overall Rating** (average of everyone's ratings). One visitor = one rating per mess; rating again changes it.
+  Ratings are stored in the mess's `reviews` list and appear on the owner and admin dashboards.
 - Contact messages and suggestions are saved in the `contacts` and `suggestions` collections
   (Atlas -> Browse Collections).
 - Passwords are stored hashed (bcrypt). Photos are stored in the database (resized by the owner dashboard).
@@ -66,8 +65,35 @@ npm start               # http://localhost:3000
 - **Website Guide** button and **visitor counter** (total unique visitors + "active" in the last 90 s) appear in the
   navbar via `extras.js` / `extras.css`; visitors are stored in the `visitors` collection.
 
-## Known limitation
-The original 15 messes (Patil, Morya, Vaishnavi, ...) are written directly into `messes.html` with their
-own photos and weekly-menu pop-ups. They are NOT in MongoDB, so the admin dashboard cannot edit or delete
-them, (their overall rating is stored in the `ratings` collection, though). Only messes added through
-the dashboard or owner registration are fully editable and live-updated.
+## The 16 messes are now owner accounts (nothing is hard-coded any more)
+`messes.html` and `index.html` no longer contain any mess. All 16 messes live in MongoDB and are shown from there.
+On the **first start** the server creates them from `seed-messes.json` (it runs only once, so a mess you delete
+never comes back). Every mess has its own owner login:
+
+| Mess | Owner email | Password |
+|---|---|---|
+| Patil Mess | patilmess@messfinder.com | 123456 |
+| Hotel Morya & Mess | hotelmoryamess@messfinder.com | 123456 |
+| Vaishnavi Lunch Mess | vaishnavilunchmess@messfinder.com | 123456 |
+| Dharmaraj Hotel | dharmarajhotel@messfinder.com | 123456 |
+| Vakratunda | vakratunda@messfinder.com | 123456 |
+| Hotel Shivbhumi & Mess | hotelshivbhumimess@messfinder.com | 123456 |
+| Payal Khanaval | payalkhanaval@messfinder.com | 123456 |
+| Nagdev Hotel | nagdevhotel@messfinder.com | 123456 |
+| Aaswad Hotel & Family Restaurant | aaswadhotelfamilyrestaurant@messfinder.com | 123456 |
+| Hotel Aarambh | hotelaarambh@messfinder.com | 123456 |
+| Christy Restaurant | christyrestaurant@messfinder.com | 123456 |
+| Maitri Katta | maitrikatta@messfinder.com | 123456 |
+| Swagat Gharghuti Mess | swagatgharghutimess@messfinder.com | 123456 |
+| Shree Swami Samarth | shreeswamisamarth@messfinder.com | 123456 |
+| Sugam Dining Hall | sugamdininghall@messfinder.com | 123456 |
+| Jai Malhar Hotel & Mess | jaimalharhotelmess@messfinder.com | 123456 |
+
+Owners log in at `owner-login.html` and should change nothing but their details; the admin can set a new
+password for any owner in the admin dashboard (edit the mess and type a new password).
+
+- **Ratings**: each mess shows one rating only, the **Overall Rating** = average of all visitors' ratings.
+  One visitor = one rating per mess (rating again changes it). Ratings that visitors had already given to the old
+  built-in cards were copied into the messes on the first start, so nothing is lost.
+- **Today's Special** was removed everywhere (site, API, and old records).
+- Photos of the 16 messes stay as files in `public/` (e.g. `morya.jpg`); owners can upload a new photo any time.

@@ -365,22 +365,23 @@ function findLocation(){
 }
 async function loadStatistics(){
 
-    // built-in messes written in the page
-    let total = document.querySelectorAll("#messList .mess-item").length;
-    let veg = document.querySelectorAll("#messList .mess-item.veg").length;
-    let nonVeg = document.querySelectorAll("#messList .mess-item.nonveg").length;
-
-    // plus every mess stored in the database (added by admin or owners)
+    // every mess is stored in the database (added by admin or owners)
     const dbMesses = await getDbMesses(true);
+
+    let total = 0;
+    let veg = 0;
+    let nonVeg = 0;
 
     dbMesses.forEach(function(m){
         total++;
-        if(m.type === "Non-Veg"){
-            nonVeg++;
-        }else if(m.type === "Veg" || m.type === "Veg & Non-Veg"){
+        if(m.type === "Veg"){
             veg++;
+        }else if(m.type === "Non-Veg" || m.type === "Veg & Non-Veg"){
+            nonVeg++;
         }
     });
+
+    renderMessPopupList(dbMesses);
 
     document.getElementById("totalMesses").innerText = total;
     document.getElementById("vegMesses").innerText = veg;
@@ -576,7 +577,7 @@ async function renderFavorites(){
         return;
     }
 
-    const all = BUILTIN_MESSES.concat(await getDbMesses());
+    const all = await getDbMesses();
 
     let html = "";
 
@@ -629,6 +630,22 @@ function normalizeType(t){
     return "Not specified";
 }
 
+function renderMessPopupList(list){
+
+    const box = document.getElementById("messList");
+    if(!box) return;
+
+    box.innerHTML = (list || []).map(function(m){
+        const cls = m.type === "Veg" ? "veg" : "nonveg";
+        return `<div class="mess-item ${cls}"
+onclick="window.location.href='messes.html#${escHtml(m.id)}'">
+▶ ${escHtml(m.name)}
+</div>
+
+`;
+    }).join("");
+}
+
 async function getDbMesses(force){
 
     if(!force && Date.now() - dbMessesFetchedAt < 20000){
@@ -661,137 +678,7 @@ async function getDbMesses(force){
     return dbMessesCache;
 }
 
-const BUILTIN_MESSES = [
 
-    {
-        id: "patilMess",
-        name: "Patil Mess",
-        location: "Pune",
-        mealPrice: "₹3000 per month",
-        type: "Veg"
-    },
-
-    {
-        id: "moryaMess",
-        name: "Hotel Morya & Mess",
-        location: "Pune",
-        mealPrice: "₹3200 per month",
-        type: "Veg"
-    },
-
-    {
-        id: "vaishnaviMess",
-        name: "Vaishnavi Mess",
-        location: "Pune",
-        mealPrice: "₹3500 per month",
-        type: "Non-Veg"
-    },
-
-    {
-        id: "dharmarajMess",
-        name: "Dharmaraj Hotel",
-        location: "Pune",
-        mealPrice: "See details",
-        type: "Non-Veg"
-    },
-
-    {
-        id: "vakratundaMess",
-        name: "Vakratunda",
-        location: "Pune",
-        mealPrice: "₹3000 per month",
-        type: "Veg"
-    },
-
-    {
-        id: "shivbhumiMess",
-        name: "Hotel Shivbhumi & Mess",
-        location: "Pune",
-        mealPrice: "₹100 - ₹180 per meal",
-        type: "Non-Veg"
-    },
-
-    {
-        id: "payalMess",
-        name: "Payal Khanaval",
-        location: "Pune",
-        mealPrice: "₹80 - ₹150 per meal",
-        type: "Non-Veg"
-    },
-
-    {
-        id: "nagdevMess",
-        name: "Nagdev Hotel",
-        location: "Pune",
-        mealPrice: "₹50 - ₹150 per meal",
-        type: "Non-Veg"
-    },
-
-    {
-        id: "aaswadMess",
-        name: "Aaswad Hotel & Family Restaurant",
-        location: "Pune",
-        mealPrice: "₹40 - ₹170 per meal",
-        type: "Non-Veg"
-    },
-
-    {
-        id: "aarambhMess",
-        name: "Hotel Aarambh",
-        location: "Pune",
-        mealPrice: "₹10 - ₹120 per meal",
-        type: "Non-Veg"
-    },
-
-    {
-        id: "christyMess",
-        name: "Christy Restaurant",
-        location: "Pune",
-        mealPrice: "₹10 - ₹260 per meal",
-        type: "Non-Veg"
-    },
-
-    {
-        id: "maitriMess",
-        name: "Maitri Katta",
-        location: "Pune",
-        mealPrice: "₹30 - ₹120 per meal",
-        type: "Veg"
-    },
-
-    {
-        id: "swagatMess",
-        name: "Swagat Gharghuti Mess",
-        location: "Pune",
-        mealPrice: "₹10 - ₹130 per meal",
-        type: "Non-Veg"
-    },
-
-    {
-        id: "swamiMess",
-        name: "Shree Swami Samarth",
-        location: "Pune",
-        mealPrice: "₹40 - ₹140 per meal",
-        type: "Veg"
-    },
-
-    {
-        id: "sugamMess",
-        name: "Sugam Dining Hall",
-        location: "Pune",
-        mealPrice: "₹50 - ₹150 per meal",
-        type: "Veg"
-    },
-
-    {
-        id: "jaimalharMess",
-        name: "Jai Malhar Hotel & Mess",
-        location: "Pune",
-        mealPrice: "₹60 per meal",
-        type: "Veg & Non-Veg"
-    }
-
-];
 
 function closeMessFilters() {
     document.getElementById("messFilterScreen").style.display = "none";
@@ -865,7 +752,7 @@ async function findFilteredMesses() {
 
 
     // Built-in messes plus the ones saved in the database
-    const messes = BUILTIN_MESSES.concat(await getDbMesses());
+    const messes = await getDbMesses();
 
 
     // Price filtering
@@ -876,13 +763,18 @@ async function findFilteredMesses() {
             return true;
         }
 
+        // Some messes list "monthly plan | Meals ..." - use the per-meal part when there is one
+        const mealPart =
+            mess.mealPrice.split("|").find(p => /meal|breakfast/i.test(p))
+            || mess.mealPrice;
+
         // Extract numbers from price
         const numbers =
-            mess.mealPrice.match(/\d+/g);
+            mealPart.match(/\d+/g);
 
         // Monthly plans are not used for
         // per-meal filtering
-        if (!numbers || /month/i.test(mess.mealPrice)) {
+        if (!numbers || /month/i.test(mealPart)) {
             return false;
         }
 
@@ -1233,89 +1125,7 @@ onkeyup="searchPopupMess()">
 <button onclick="popupFilter('nonveg')">🔴 Non-Veg</button>
 </div>
 
-<div id="messList">
-
-<div class="mess-item veg"
-onclick="window.location.href='messes.html#patilMess'">
-▶ Patil Mess
-</div>
-
-<div class="mess-item veg"
-onclick="window.location.href='messes.html#moryaMess'">
-▶ Hotel Morya & Mess
-</div>
-
-<div class="mess-item nonveg"
-onclick="window.location.href='messes.html#vaishnaviMess'">
-▶ Vaishnavi Mess
-</div>
-
-<div class="mess-item nonveg"
-onclick="window.location.href='messes.html#dharmarajMess'">
-▶ Dharmaraj Hotel
-</div>
-
-<div class="mess-item veg"
-onclick="window.location.href='messes.html#vakratundaMess'">
-▶ Vakratunda
-</div>
-
-<div class="mess-item nonveg"
-onclick="window.location.href='messes.html#shivbhumiMess'">
-▶ Hotel Shivbhumi & Mess
-</div>
-
-<div class="mess-item nonveg"
-onclick="window.location.href='messes.html#payalMess'">
-▶ Payal Khanaval
-</div>
-
-<div class="mess-item nonveg"
-onclick="window.location.href='messes.html#nagdevMess'">
-▶ Nagdev Hotel
-</div>
-
-<div class="mess-item nonveg"
-onclick="window.location.href='messes.html#aaswadMess'">
-▶ Aaswad Hotel & Family Restaurant
-</div>
-
-<div class="mess-item nonveg"
-onclick="window.location.href='messes.html#aarambhMess'">
-▶ Hotel Aarambh
-</div>
-
-<div class="mess-item nonveg"
-onclick="window.location.href='messes.html#christyMess'">
-▶ Christy Restaurant
-</div>
-
-<div class="mess-item veg"
-onclick="window.location.href='messes.html#maitriMess'">
-▶ Maitri Katta
-</div>
-
-<div class="mess-item nonveg"
-onclick="window.location.href='messes.html#swagatMess'">
-▶ Swagat Gharghuti Mess
-</div>
-
-<div class="mess-item veg"
-onclick="window.location.href='messes.html#swamiMess'">
-▶ Shree Swami Samarth
-</div>
-
-<div class="mess-item veg"
-onclick="window.location.href='messes.html#sugamMess'">
-▶ Sugam Dining Hall
-</div>
-
-<div class="mess-item veg"
-onclick="window.location.href='messes.html#jaimalharMess'">
-▶ Jai Malhar Hotel & Mess
-</div>
-
-</div>
+<div id="messList"></div>
 
 </div>
 
